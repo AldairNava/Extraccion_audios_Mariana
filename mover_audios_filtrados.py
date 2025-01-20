@@ -3,6 +3,7 @@ import os
 import shutil
 from ftplib import FTP, error_perm, all_errors
 from Tele import send_msg
+import subprocess
 
 db_config = {
     'host': '192.168.51.210',
@@ -87,6 +88,7 @@ def subir_archivos_ftp():
                 print(f"Error general al subir el archivo {archivo}: {e}")
         
         ftp.quit()
+        subprocess.run(["python", "eliminar_audios.py"], check=True)
     except all_errors as e:
         print(f"Error en la conexión FTP: {e}")
 
