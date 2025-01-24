@@ -92,7 +92,7 @@ def subir_archivos_ftp():
         print(f"Error en la conexión FTP: {e}")
 
     print(f"Total de archivos subidos: {archivos_subidos}")
-    # send_msg(f"Total de Audios subidos al ftp {archivos_subidos}")
+    send_msg(f"Total de Audios subidos al ftp {archivos_subidos}")
 
 if __name__ == "__main__":
     try:
@@ -102,5 +102,5 @@ if __name__ == "__main__":
         print("ARCHIVOS SUBIDOS")
         print("Esperando Siguiente Carga de Audios......")
     except Exception as e:
-        # send_msg(f"Error en el proceso principal: {e}")
+        send_msg(f"Error en el proceso principal: {e}")
         print(f"Error en el proceso principal: {e}")
