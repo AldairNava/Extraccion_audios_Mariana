@@ -2,6 +2,7 @@ import sys
 import os
 import pandas as pd
 import mysql.connector
+from send2trash import send2trash # Importar la biblioteca send2trash
 
 def find_csv_file(directory):
     for file in os.listdir(directory):
@@ -55,7 +56,7 @@ def load_data_to_db(file_path, table_name):
 
     # Eliminar el archivo después de cargar los datos
     try:
-        os.remove(file_path)
+        send2trash(file_path)
         print(f"Archivo {file_path} eliminado exitosamente.")
     except Exception as e:
         print(f"Error al eliminar el archivo {file_path}: {str(e)}")

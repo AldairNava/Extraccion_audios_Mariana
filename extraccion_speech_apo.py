@@ -368,14 +368,14 @@ def main(i, x):
     rango_llamada_1 = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[4]/div/value-range-field-search/div/div/input[1]')
     rango_llamada_1.click()
     sleep(2)
-    rango_llamada_1.send_keys('400')
+    rango_llamada_1.send_keys('300')
     sleep(2)
     
     print("rango 2 de 600s")
     rango_llamada_2 = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[4]/div/value-range-field-search/div/div/input[2]')
     rango_llamada_2.click()
     sleep(2)
-    rango_llamada_2.send_keys('720')
+    rango_llamada_2.send_keys('600')
     sleep(2)
     
     print("Busqueda de audios iniciada")
