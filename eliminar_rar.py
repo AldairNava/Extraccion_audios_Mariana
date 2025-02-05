@@ -1,5 +1,6 @@
 import os
 import shutil
+from send2trash import send2trash
 
 def delete_contents(folder_paths):
     for folder_path in folder_paths:
@@ -8,7 +9,11 @@ def delete_contents(folder_paths):
                 for file in files:
                     file_path = os.path.join(root, file)
                     try:
-                        os.remove(file_path)
+                        if file_path.endswith('.csv'):
+                            send2trash(file_path)
+                            print(f"Archivo CSV movido a la papelera: '{file_path}'")
+                        else:
+                            os.remove(file_path)
                     except Exception as e:
                         print(f"Error al eliminar '{file_path}': {e}")
 

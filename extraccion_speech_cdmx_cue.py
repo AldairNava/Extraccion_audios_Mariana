@@ -126,7 +126,7 @@ def main(i, x):
     personal.click()
     sleep(2)
 
-    if x == '5':
+    if x == "5":
         print("Ingresando a rango de fecha De: ")
         de_rango = driver.find_element(By.XPATH, de)
         today = datetime.datetime.now()

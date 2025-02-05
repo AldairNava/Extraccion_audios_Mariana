@@ -29,13 +29,13 @@ def ejecutar_tareas_con_valor(x):
 
 def main():
     print("Esperando Horario de Ejecución Extracción Mariana...")
-    schedule.every().monday.at("12:00").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
-    schedule.every().day.at("13:00").do(lambda: subprocess.run(["python", "truncate.py"], check=True))
-    schedule.every().day.at("13:01").do(ejecutar_tareas_con_valor, x=1)
-    schedule.every().day.at("18:10").do(ejecutar_tareas_con_valor, x=2)
-    schedule.every().day.at("20:30").do(ejecutar_tareas_con_valor, x=3)
-    schedule.every().day.at("00:00").do(lambda: subprocess.run(["python", "Procesos_MySQL.py"], check=True))
-    # schedule.every().day.at("00:45").do(lambda: subprocess.run(["python", "mover_audios_filtrados.py"], check=True))
+    schedule.every().monday.at("12:30").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
+    schedule.every().monday.at("12:58").do(lambda: subprocess.run(["python", "eliminar_audios.py"], check=True))
+    schedule.every().day.at("12:59").do(lambda: subprocess.run(["python", "truncate.py"], check=True))
+    schedule.every().day.at("13:00").do(ejecutar_tareas_con_valor, x=1)
+    schedule.every().day.at("14:00").do(ejecutar_tareas_con_valor, x=2)
+    schedule.every().day.at("19:00").do(ejecutar_tareas_con_valor, x=3)
+    # schedule.every().day.at("00:00").do(lambda: subprocess.run(["python", "Procesos_MySQL.py"], check=True))
 
     while True:
         schedule.run_pending()
