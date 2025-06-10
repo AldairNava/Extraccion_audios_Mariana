@@ -53,7 +53,7 @@ def validar_elemento_presentes(driver, i, x, manual,x_path):
             intentos += 1
             print("Cargando Ventana")
             print(f"Intento {intentos} fallido. Error: 'elemento no Enocntrado'")
-            time.sleep(10)
+            time.sleep(30)
     
     if intentos == MAX_INTENTOS:
         print(f"No se pudo encontrar el elemento después de {MAX_INTENTOS} intentos. Reiniciando el proceso.")

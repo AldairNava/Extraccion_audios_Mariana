@@ -5,11 +5,35 @@ import mysql.connector
 import threading
 from send2trash import send2trash
 
+# Carpetas donde buscar los audios
+AUDIO_FOLDERS = [
+    r"carpeta_de_audios/audios_filtrados",
+    r"carpeta_de_audios/audios_rar_retenciones",
+    r"carpeta_de_audios/audios_rar_servicios",
+    r"carpeta_de_audios/audios_rar_servicios_apo",
+    r"carpeta_de_audios/audios_rar_soporte",
+    r"carpeta_de_audios/audios_rar_soporte_apo"
+]
+BASE_AUDIO_PATH = r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana"
+
 def find_csv_file(directory):
     for file in os.listdir(directory):
         if file.endswith(".csv"):
             return os.path.join(directory, file)
     return None
+
+def buscar_audio(external_id):
+    for carpeta in AUDIO_FOLDERS:
+        ruta = os.path.join(BASE_AUDIO_PATH, carpeta, f"{external_id}.mp3")
+        if os.path.isfile(ruta):
+            return ruta
+    return None
+
+def audio_valido(external_id):
+    ruta_audio = buscar_audio(external_id)
+    if ruta_audio and os.path.getsize(ruta_audio) >= 5 * 1024:
+        return True
+    return False
 
 def load_data_to_db(file_path, table_name):
     if not file_path:
@@ -25,6 +49,16 @@ def load_data_to_db(file_path, table_name):
 
     # Renombrar las columnas para coincidir con los nombres de la base de datos
     df.columns = ["External_ID", "Interaction_Time", "Duration", "Metadata_agentId", "Metadata_Cuenta", "Metadata_CasoNegocio"]
+
+    # Filtrar registros según existencia y tamaño del audio
+    registros_validos = []
+    omitidos = 0
+    for _, row in df.iterrows():
+        external_id = str(row["External_ID"])
+        if audio_valido(external_id):
+            registros_validos.append(tuple(row))
+        else:
+            omitidos += 1
 
     # Aquí configuramos el temporizador de 90 segundos
     def timeout():
@@ -53,9 +87,9 @@ def load_data_to_db(file_path, table_name):
         failed_rows_count = 0  # Contador de registros fallidos
 
         print("tabla definida e insertando registros...")
-        for _, row in df.iterrows():
+        for row in registros_validos:
             try:
-                cursor.execute(insert_query, tuple(row))
+                cursor.execute(insert_query, row)
                 inserted_rows_count += 1
             except mysql.connector.Error as err:
                 # print(f"Error al insertar el registro: {row}. Error: {err}")
@@ -68,6 +102,7 @@ def load_data_to_db(file_path, table_name):
 
         print(f"Se insertaron {inserted_rows_count} registros en la tabla {table_name}.")
         print(f"Fallaron {failed_rows_count} registros durante la inserción.")
+        print(f"Se omitieron {omitidos} registros por audio no encontrado o menor a 5KB.")
     except mysql.connector.Error as err:
         print(f"Error al conectar a la base de datos: {err}")
     finally:

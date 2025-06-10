@@ -51,7 +51,7 @@ def validar_elemento_presentes(driver, i, x, manual,x_path):
             intentos += 1
             print("Cargando Ventana")
             print(f"Intento {intentos} fallido. Error: 'elemento no Enocntrado'")
-            time.sleep(10)
+            time.sleep(30)
     
     if intentos == MAX_INTENTOS:
         print(f"No se pudo encontrar el elemento después de {MAX_INTENTOS} intentos. Reiniciando el proceso.")
@@ -252,7 +252,7 @@ def main(i, x,manual):
         # Diccionario con los horarios
         xpath = {
             "2": {"hora": "2:00 pm", "xpath": dos_pm_1},
-            "3": {"hora": "6:00 pm", "xpath": seis_pm_1},
+            "3": {"hora": "5:00 pm", "xpath": cinco_pm_1},
         }
 
         seleccionar_horario(driver, x, fecha_1, xpath)
@@ -590,7 +590,7 @@ def main(i, x,manual):
 
 
 if __name__ == '__main__':
-    horarios=["1","2","3"]
+    horarios=["3"]
     for x in horarios:
 
         if x == "1":

@@ -84,5 +84,5 @@ def iniciar_proceso_transcripcion():
         
 
 if __name__ == "__main__":
-    main()
-    # ejecutar_tareas_con_valor()
+    # main()
+    ejecutar_tareas_con_valor()
