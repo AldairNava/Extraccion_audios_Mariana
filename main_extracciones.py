@@ -58,7 +58,7 @@ def main():
     schedule.every().monday.at("12:00").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
     schedule.every().monday.at("12:01").do(lambda: subprocess.run(["python", "Update_asignaciones_avena.py"], check=True))
     schedule.every().monday.at("12:02").do(lambda: subprocess.run(["python", "eliminar_audios.py"], check=True))
-    schedule.every().monday.at("12:02").do(lambda: subprocess.run(["python", "eliminar_rar.py"], check=True))
+    schedule.every().monday.at("12:03").do(lambda: subprocess.run(["python", "eliminar_rar.py"], check=True))
     schedule.every().day.at("23:59").do(lambda: subprocess.run(["python", "truncate.py"], check=True))
     schedule.every().day.at("00:00").do(ejecutar_tareas_con_valor)
 

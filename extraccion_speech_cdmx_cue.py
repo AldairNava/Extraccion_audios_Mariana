@@ -39,7 +39,7 @@ def find_zip_p_efgarciac(directory):
 
 pyautogui.FAILSAFE = False
 
-def validar_elemento_presentes(driver, i, x, manual,x_path):
+def validar_elemento_presentes(driver, i, x, manual,x_path, intentos_fallidos):
     intentos = 0
     MAX_INTENTOS = 5
 
@@ -58,7 +58,7 @@ def validar_elemento_presentes(driver, i, x, manual,x_path):
     if intentos == MAX_INTENTOS:
         print(f"No se pudo encontrar el elemento después de {MAX_INTENTOS} intentos. Reiniciando el proceso.")
         driver.quit()
-        main(i, x, manual) 
+        main(i, x, manual, intentos_fallidos) 
 
 def descargas_automatica_no_seguro(driver):
     print("\nIniciando ajuste descargas automáticas")
@@ -145,7 +145,10 @@ def agregar_valores_vqd(driver, i):
             driver.execute_script("arguments[0].scrollIntoView(true);", valores_input_but_mas)
             valores_input_but_mas.click()
 
-def main(i, x,manual):
+def main(i, x,manual, intentos_fallidos):
+
+    iteraccion = (x, i,)
+    intentos_actuales = intentos_fallidos.get(iteraccion, 0)
     try:
         opciones = webdriver.ChromeOptions()
         opciones.add_argument('--ignore-certificate-errors') 
@@ -177,7 +180,7 @@ def main(i, x,manual):
         sleep(5)
 
         #validar carga de pagina en chrome
-        validar_elemento_presentes(driver, i, x, manual,check_gen)
+        validar_elemento_presentes(driver, i, x, manual,check_gen, intentos_fallidos)
 
         # ************ Inicio de sesion
         print("Seleccionando opcion Genesys")
@@ -200,7 +203,7 @@ def main(i, x,manual):
         print("Iniciando sesión")
         password.send_keys(Keys.RETURN)
             
-        validar_elemento_presentes(driver, i, x, manual,'//span[@class = "navbar-appname ng-binding"]')
+        validar_elemento_presentes(driver, i, x, manual,'//span[@class = "navbar-appname ng-binding"]', intentos_fallidos)
         
         # ********** SELECCION DE RANGO DE FECHAS
         print("\nSeleccionando rango de fechas de seleccion de descarga")
@@ -386,182 +389,189 @@ def main(i, x,manual):
         busqueda_ex.click()
         sleep(20)
 
-        validar_elemento_presentes(driver, i, x, manual,'//span[@dir="ltr" and contains(@ng-show, "params.dataProvider.totalNumberOfResults") and contains(@class, "ng-binding")]')
+        validar_elemento_presentes(driver, i, x, manual,'//span[@dir="ltr" and contains(@ng-show, "params.dataProvider.totalNumberOfResults") and contains(@class, "ng-binding")]', intentos_fallidos)
         
         # ********** VENTANA DE EXPORTACION
-        validar_elemento_presentes(driver, i, x, manual,reconocimiento)
+        validar_elemento_presentes(driver, i, x, manual,reconocimiento, intentos_fallidos)
         print("Pagina de exportacion abierta")
         sleep(2)
         
-        print("Click en checkbox seleccion todo")
-        checkbox_select = driver.find_element(By.XPATH, check_seleccion)
-        checkbox_select.click()
-        sleep(2)
-        
-        print("Expandiendo menu de seleccion")
-        exp_sel = driver.find_element(By.XPATH, expacion)
-        exp_sel.click()
-        sleep(2)
-        
-        print("Seleccionando exportar")
-        expo_expo = driver.find_element(By.XPATH, expacion_exportar)
-        expo_expo.click()
-        sleep(20)
-        
-        # ********** VENTANA DE EXPORTACION MODAL 1
-        
-        print("\nAccediendo a ventana modal 1 seleccion de audios")
-
         try:
-            print("Esperando a que la primer ventana modal esté visible")
-            modal = WebDriverWait(driver, 20).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.export-modal.in'))
-            )
-            print("Modal está visible")
+            print("Esperando a que el checkbox de 'Seleccionar todo' esté presente y sea clickeable")
+            print("Click en checkbox seleccion todo")
+            checkbox_select = driver.find_element(By.XPATH, check_seleccion)
+            checkbox_select.click()
             sleep(2)
+            
+            print("Expandiendo menu de seleccion")
+            exp_sel = driver.find_element(By.XPATH, expacion)
+            exp_sel.click()
+            sleep(2)
+            
+            print("Seleccionando exportar")
+            expo_expo = driver.find_element(By.XPATH, expacion_exportar)
+            expo_expo.click()
+            sleep(20)
+            
+            # ********** VENTANA DE EXPORTACION MODAL 1
+            
+            print("\nAccediendo a ventana modal 1 seleccion de audios")
+
+            try:
+                print("Esperando a que la primer ventana modal esté visible")
+                modal = WebDriverWait(driver, 20).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.export-modal.in'))
+                )
+                print("Modal está visible")
+                sleep(2)
+                
+                try:
+                    print("Esperando a que el radio button esté clickeable")
+                    radio_button = WebDriverWait(driver, 120).until(
+                        EC.element_to_be_clickable((By.XPATH, '//div[@class="radio"]/label[input[@type="radio" and @value="true" and @ng-value="true"]]'))
+                    )
+                    print("Radio button está clickeable")
+                    radio_button.click()
+                    print("Hicimos clic en el radio button")
+                except Exception as e:
+                    print("Radio button no está presente o no es clickeable. Continuando sin hacer clic en el radio button.")
+                
+                sleep(2)
+                
+                print("Esperando a que el checkbox esté clickeable")
+                checkbox = WebDriverWait(driver, 60).until(
+                    EC.element_to_be_clickable((By.XPATH, '//div[@class="checkbox"]/label[input[@type="checkbox" and @ng-model="exportData.exportWithAudio"]]'))
+                )
+
+                print("Checkbox está clickeable")
+
+                checkbox.click()
+                print("Hicimos clic en el checkbox")
+                
+                sleep(2)
+                
+                print("Esperando a que el botón de exportar esté presente y sea clickeable")
+                boton_exportar = WebDriverWait(driver, 60).until(
+                    EC.element_to_be_clickable((By.XPATH, '//button[@translate="Explore.BatchActions.Export.ExportButton"]'))
+                )
+
+                print("Botón de exportar está presente y es clickeable")
+
+                boton_exportar.click()
+                print("Se hizo clic en el botón de exportar")
+                sleep(5)
+
+
+            except Exception as e:
+                print(f"Ocurrió un error: {e}")
+                main(i, x, manual, intentos_fallidos)
+                return
+                
+                
+            # ********** VENTANA DE EXPORTACION MODAL 2
+            
+            print("\nAccediendo a ventana modal 2 generador de contraseñas")
             
             try:
-                print("Esperando a que el radio button esté clickeable")
-                radio_button = WebDriverWait(driver, 120).until(
-                    EC.element_to_be_clickable((By.XPATH, '//div[@class="radio"]/label[input[@type="radio" and @value="true" and @ng-value="true"]]'))
+                print("Esperando a que la segunda ventana modal esté visible")
+                modal = WebDriverWait(driver, 20).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
                 )
-                print("Radio button está clickeable")
-                radio_button.click()
-                print("Hicimos clic en el radio button")
-            except Exception as e:
-                print("Radio button no está presente o no es clickeable. Continuando sin hacer clic en el radio button.")
-            
-            sleep(2)
-            
-            print("Esperando a que el checkbox esté clickeable")
-            checkbox = WebDriverWait(driver, 60).until(
-                EC.element_to_be_clickable((By.XPATH, '//div[@class="checkbox"]/label[input[@type="checkbox" and @ng-model="exportData.exportWithAudio"]]'))
-            )
+                print("Modal está visible")
 
-            print("Checkbox está clickeable")
-
-            checkbox.click()
-            print("Hicimos clic en el checkbox")
-            
-            sleep(2)
-            
-            print("Esperando a que el botón de exportar esté presente y sea clickeable")
-            boton_exportar = WebDriverWait(driver, 60).until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@translate="Explore.BatchActions.Export.ExportButton"]'))
-            )
-
-            print("Botón de exportar está presente y es clickeable")
-
-            boton_exportar.click()
-            print("Se hizo clic en el botón de exportar")
-            sleep(5)
-
-
-        except Exception as e:
-            print(f"Ocurrió un error: {e}")
-            main(i, x, manual)
-            return
-            
-            
-        # ********** VENTANA DE EXPORTACION MODAL 2
-        
-        print("\nAccediendo a ventana modal 2 generador de contraseñas")
-        
-        try:
-            print("Esperando a que la segunda ventana modal esté visible")
-            modal = WebDriverWait(driver, 20).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
-            )
-            print("Modal está visible")
-
-            sleep(2)
-            
-            print("Esperando a que el campo de contraseña esté presente y sea interactuable")
-            input_contraseña = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.CLASS_NAME, "password-input"))
-            )
-
-            print("Campo de contraseña está presente y es interactuable")
-
-            input_contraseña.clear()
-
-            texto_contraseña = "Cyb*^1234567"
-            input_contraseña.send_keys(texto_contraseña)
-            
-            sleep(2)
-
-            print("Esperando a que el botón 'Exportar' esté presente y sea clickeable")
-            boton_exportar = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@ng-if="logic.isStrongPassword()"]'))
-            )
-
-            print("Botón 'Exportar' está presente y es clickeable")
-
-            boton_exportar.click()
-            print("Se hizo clic en el botón 'Exportar'")
-            
-            sleep(2)
-            
-        except Exception as e:
-            print(f"Ocurrió un error: {e}")
-            main(i, x, manual)
-            return
-            
-        
-        # ********** VENTANA DE EXPORTACION MODAL 3
-        
-        print("\nAccediendo a ventana modal 3 confirmacion")
-        
-        try:
-            print("Esperando a que la tercer ventana modal esté visible")
-            modal = WebDriverWait(driver, 20).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
-            )
-            print("Modal está visible")
-
-            sleep(20)
-        except Exception as e:
-            print(f"Ocurrió un error: {e}")
-            main(i, x, manual)
-            return
-            
-        try:
-            print("Esperando a que el botón 'Completado' esté presente y sea clickeable")
-            boton_completado = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@translate="General.Done"]'))
-            )
-
-            print("Botón 'Completado' está presente y es clickeable")
-
-            boton_completado.click()
-            print("Se hizo clic en el botón 'Completado'")
-            sleep(3)
-        except Exception as e:
-            print(f"boton completado error: {e}")
+                sleep(2)
                 
-        hora_actual = datetime.datetime.now().strftime("%H:%M:%S")
-        print(f"Hora Actual:{hora_actual}")
-        print("Esperando la descarga.......")
-        sleep(400)
+                print("Esperando a que el campo de contraseña esté presente y sea interactuable")
+                input_contraseña = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.CLASS_NAME, "password-input"))
+                )
 
-        directorio = r"C:\Users\Jotzi1\Downloads"
-        resultado = find_zip_p_efgarciac(directorio)
-        while resultado:
-            print("Buscando...")
-            resultado = find_zip_p_efgarciac(directorio)
+                print("Campo de contraseña está presente y es interactuable")
+
+                input_contraseña.clear()
+
+                texto_contraseña = "Cyb*^1234567"
+                input_contraseña.send_keys(texto_contraseña)
+                
+                sleep(2)
+
+                print("Esperando a que el botón 'Exportar' esté presente y sea clickeable")
+                boton_exportar = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, '//button[@ng-if="logic.isStrongPassword()"]'))
+                )
+
+                print("Botón 'Exportar' está presente y es clickeable")
+
+                boton_exportar.click()
+                print("Se hizo clic en el botón 'Exportar'")
+                
+                sleep(2)
+                
+            except Exception as e:
+                print(f"Ocurrió un error: {e}")
+                main(i, x, manual, intentos_fallidos)
+                return
+                
             
-        try:
-            usu_cierre = driver.find_element(By.XPATH, user_cierre)
-            usu_cierre.click()
-            sleep(3)
+            # ********** VENTANA DE EXPORTACION MODAL 3
+            
+            print("\nAccediendo a ventana modal 3 confirmacion")
+            
+            try:
+                print("Esperando a que la tercer ventana modal esté visible")
+                modal = WebDriverWait(driver, 20).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
+                )
+                print("Modal está visible")
 
-            cierre_final = driver.find_element(By.XPATH, cierre)
-            cierre_final.click()
-            sleep(90)
-            driver.quit()
+                sleep(20)
+            except Exception as e:
+                print(f"Ocurrió un error: {e}")
+                main(i, x, manual, intentos_fallidos)
+                return
+                
+            try:
+                print("Esperando a que el botón 'Completado' esté presente y sea clickeable")
+                boton_completado = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, '//button[@translate="General.Done"]'))
+                )
+
+                print("Botón 'Completado' está presente y es clickeable")
+
+                boton_completado.click()
+                print("Se hizo clic en el botón 'Completado'")
+                sleep(3)
+            except Exception as e:
+                print(f"boton completado error: {e}")
+                    
+            hora_actual = datetime.datetime.now().strftime("%H:%M:%S")
+            print(f"Hora Actual:{hora_actual}")
+            print("Esperando la descarga.......")
+            sleep(400)
+
+            directorio = r"C:\Users\Jotzi1\Downloads"
+            resultado = find_zip_p_efgarciac(directorio)
+            while resultado:
+                print("Buscando...")
+                resultado = find_zip_p_efgarciac(directorio)
+                
+            try:
+                usu_cierre = driver.find_element(By.XPATH, user_cierre)
+                usu_cierre.click()
+                sleep(3)
+
+                cierre_final = driver.find_element(By.XPATH, cierre)
+                cierre_final.click()
+                sleep(90)
+                driver.quit()
+            except Exception as e:
+                print(f"Ocurrió un error al cerrar la sesion: {e}")
+                driver.quit()
         except Exception as e:
-            print(f"Ocurrió un error al cerrar la sesion: {e}")
+            print("⚠️ No se encontraron audios para exportar. Saltando a la siguiente iteración.")
+            send_msg(f"⚠️ No se encontraron audios para exportar en la iteración x={x}, i={i}. Saltando a la siguiente iteración.")
             driver.quit()
+            return
         
         print("\nIniciando extraccion de archvio zip")
         subprocess.run(["python", "extraccion_archivos.py", f"{str(i)}"])
@@ -574,20 +584,24 @@ def main(i, x,manual):
         print("\nIniciando carga a la base de datos")
         subprocess.run(["python", "carga_base.py", f"{str(i)}"])
         sleep(20)
-        
     except Exception as e:
-        error=f"Error en el proceso desconocido durante la descarga reiniciando donde se quedo{e}"
-        print(error)
-        send_msg("Error en el proceso desconocido durante la descarga reiniciando donde se quedo")
-        driver.quit()
-        main(i, x, manual)
-        return
+        intentos_actuales += 1
+        intentos_fallidos[iteraccion] = intentos_actuales
+        if intentos_actuales < 5:
+            print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+            main(i, x, manual, intentos_fallidos)
+        else:
+            msg = f"⚠️ Error persistente tras 5 intentos. Falló en interacción x={x}, Campaña i={i}. Deteniendo proceso."
+            print(msg)
+            send_msg(msg)
+            sys.exit(1)
     
 
 
 if __name__ == '__main__':
     horarios = ["1", "2", "3"]
-    
+    intentos_fallidos = {}
+
     for x in horarios:
         if x == "1":
             send_msg("Iniciando horario 1 de 00:00am a 12:00pm CDMX")
@@ -599,4 +613,4 @@ if __name__ == '__main__':
         for i in range(3):
             manual = True
             print("\nValor de iteración cdmx-cuernavaca: ", i)
-            main(i, x, manual)
+            main(i, x, manual, intentos_fallidos)

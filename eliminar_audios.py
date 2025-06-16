@@ -30,6 +30,7 @@ if __name__ == "__main__":
         r'C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\carpeta_de_audios\audios_rar_servicios_apo',
         r'C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\carpeta_de_audios\audios_rar_soporte',
         r'C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\carpeta_de_audios\audios_rar_soporte_apo',
+        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\audios_subidos"
     ]
 
     delete_contents(folders_to_clear)

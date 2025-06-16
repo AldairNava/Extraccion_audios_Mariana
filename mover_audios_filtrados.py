@@ -19,6 +19,9 @@ ftp_config = {
     'remote_dir': 'Audios'
 }
 
+# Carpeta donde guardaremos los audios luego de subirlos
+directorio_subidos = r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\audios_subidos"
+
 def obtener_nombres_audios_pendientes():
     conexion = mysql.connector.connect(**db_config)
     try:
@@ -78,6 +81,9 @@ def actualizar_estado_audio(audio_name, nuevo_estado):
         conexion.close()
 
 def subir_archivos_ftp():
+    # Asegurarse de que la carpeta de audios_subidos exista
+    os.makedirs(directorio_subidos, exist_ok=True)
+
     archivos_subidos = 0
     try:
         ftp = FTP()
@@ -91,10 +97,15 @@ def subir_archivos_ftp():
                 with open(ruta_archivo, 'rb') as file:
                     ftp.storbinary(f'STOR {archivo}', file)
                     print(f"Subido a la carpeta ftp: {archivo}")
-                os.remove(ruta_archivo)
-                print(f"Eliminado archivo local: {ruta_archivo}")
+
+                # En lugar de eliminar, mover a directorio_subidos
+                destino_subido = os.path.join(directorio_subidos, archivo)
+                shutil.move(ruta_archivo, destino_subido)
+                print(f"Movido archivo a carpeta de subidos: {destino_subido}")
+
                 actualizar_estado_audio(archivo, 'Pendiente')
                 archivos_subidos += 1
+
             except error_perm as e:
                 print(f"Permiso denegado al subir el archivo {archivo}: {e}")
                 send_msg(f"Permiso denegado al subir el archivo {archivo}: {e}")
