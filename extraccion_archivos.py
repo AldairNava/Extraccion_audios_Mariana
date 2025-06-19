@@ -1,101 +1,86 @@
 import os
 import shutil
 import patoolib
-from time import sleep
+import patoolib.util
 import sys
-import subprocess
 
 def limpiar_carpeta(carpeta):
     for archivo in os.listdir(carpeta):
-        ruta_archivo = os.path.join(carpeta, archivo)
+        ruta = os.path.join(carpeta, archivo)
         try:
-            if os.path.isfile(ruta_archivo) or os.path.islink(ruta_archivo):
-                os.unlink(ruta_archivo)
-            elif os.path.isdir(ruta_archivo):
-                shutil.rmtree(ruta_archivo)
+            if os.path.isfile(ruta) or os.path.islink(ruta):
+                os.unlink(ruta)
+            elif os.path.isdir(ruta):
+                shutil.rmtree(ruta)
         except Exception as e:
-            print(f'Error al eliminar {ruta_archivo}. Razón: {e}')
+            print(f'Error al eliminar {ruta}. Razón: {e}')
 
-def mover_archivo(nombre_archivo, carpeta_destino, contrasenas):
+def mover_y_extraer(nombre_prefijo, carpeta_destino, contrasenas):
     carpeta_descargas = os.path.join(os.environ['USERPROFILE'], 'Downloads')
-    
+    # Buscar el primer ZIP que contenga el prefijo
     for archivo in os.listdir(carpeta_descargas):
-        if nombre_archivo in archivo:
-            ruta_archivo_origen = os.path.join(carpeta_descargas, archivo)
-            ruta_archivo_destino = os.path.join(carpeta_destino, archivo)
-            
-            print(f"Moviendo archivo {archivo} a {ruta_archivo_destino}...")
-            shutil.move(ruta_archivo_origen, ruta_archivo_destino)
-            print(f"Archivo {archivo} movido a {ruta_archivo_destino}")
-            
-            if archivo.endswith('.zip'):
-                exito_extraccion = False
-                for contrasena in contrasenas:
-                    try:
-                        print(f"Extrayendo archivo {archivo} en {carpeta_destino} con la contraseña '{contrasena}'...")
-                        patoolib.extract_archive(ruta_archivo_destino, outdir=carpeta_destino, password=contrasena)
-                        print(f"Archivo {archivo} extraído en {carpeta_destino}")
-                        
-                        archivos_extraidos = os.listdir(carpeta_destino)
-                        num_archivos_extraidos = len(archivos_extraidos)
-                        print(f"Se extrajeron {num_archivos_extraidos} archivos del archivo ZIP.")
-                        exito_extraccion = True
-                        break
-                    except patoolib.util.PatoolError as e:
-                        print(f"No se pudo extraer {archivo} con la contraseña '{contrasena}': {e}")
-                
-                # if not exito_extraccion:
-                #     shutil.move(ruta_archivo_destino, ruta_archivo_origen)
-                #     print(f"Archivo {archivo} movido de vuelta a {ruta_archivo_origen}")
-                #     limpiar_carpeta(carpeta_destino)
-                #     print(f"Carpeta {carpeta_destino} ha sido limpiada.")
-            
-            return
-    
-    print(f"No se encontró ningún archivo que contenga '{nombre_archivo}' en la carpeta {carpeta_descargas}")
+        if nombre_prefijo in archivo and archivo.lower().endswith('.zip'):
+            origen = os.path.join(carpeta_descargas, archivo)
+            destino = os.path.join(carpeta_destino, archivo)
 
-def main(i, manual):
-    nombre_archivo = "cmanriquez"
-    carpetas_destino = {
+            print(f"Moviendo archivo {archivo} a {destino}...")
+            shutil.move(origen, destino)
+
+            # Intentar extracción con cada contraseña
+            for pwd in contrasenas:
+                try:
+                    print(f"Extrayendo {archivo} en {carpeta_destino} con contraseña '{pwd}'…")
+                    patoolib.extract_archive(destino,
+                                             outdir=carpeta_destino,
+                                             password=pwd)
+                    break
+                except patoolib.util.PatoolError as e:
+                    print(f"  ⚠️ Error extrayendo con '{pwd}': {e}")
+            else:
+                print("  ❌ No se pudo extraer completamente con ninguna contraseña.")
+
+            # 1) Eliminar carpetas vacías
+            for entry in os.listdir(carpeta_destino):
+                ruta_entry = os.path.join(carpeta_destino, entry)
+                if os.path.isdir(ruta_entry):
+                    # buscar mp3 dentro
+                    mp3s = [f for f in os.listdir(ruta_entry)
+                            if f.lower().endswith('.mp3')]
+                    if not mp3s:
+                        shutil.rmtree(ruta_entry)
+                        print(f"Eliminada carpeta vacía: {entry}")
+
+            # 2) Contar archivos .mp3 extraídos
+            total_mp3 = 0
+            for root, _, files in os.walk(carpeta_destino):
+                total_mp3 += sum(1 for f in files
+                                  if f.lower().endswith('.mp3'))
+            print(f"✅ Se extrajeron {total_mp3} archivos .mp3 en '{carpeta_destino}'.")
+
+            return
+
+    print(f"No se encontró ningún ZIP con prefijo '{nombre_prefijo}' en Descargas.")
+
+def main(i):
+    nombre_prefijo = "p-efgarciac"
+    carpetas = {
         '0': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\servicios_rar",
         '1': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\soporte_rar",
         '2': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\retenciones_rar",
         '3': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\servicios_apodaca_rar",
         '4': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\soporte_apodaca_rar"
     }
+    contrasenas = ['Cyb*^1234567']
 
-    contrasenas_manual = {
-        '0': 'Cyb*^1234567',
-        '1': 'Cyb*^1234567',
-        '2': 'Cyb*^1234567',
-        '3': 'Cyb*^1234567',
-        '4': 'Cyb*^1234567'
-    }
+    carpeta_destino = carpetas.get(i)
+    if not carpeta_destino:
+        print(f"El valor '{i}' no es válido. Usa un número entre 0 y 4.")
+        return
 
-    contrasena_predeterminada = 'Cyb*^1234567'
-
-    carpeta_destino = carpetas_destino.get(i)
-    
-    if manual:
-        contrasena = contrasenas_manual.get(i)
-        if carpeta_destino and contrasena:
-            mover_archivo(nombre_archivo, carpeta_destino, [contrasena])
-        else:
-            print(f"El valor '{i}' no es válido o falta la contraseña. Por favor, proporciona un valor entre 0 y 4.")
-    else:
-        if carpeta_destino:
-            mover_archivo(nombre_archivo, carpeta_destino, [contrasena_predeterminada])
-        else:
-            print(f"El valor '{i}' no es válido. Por favor, proporciona un valor entre 0 y 4.")
+    mover_y_extraer(nombre_prefijo, carpeta_destino, contrasenas)
 
 if __name__ == "__main__":
-    manual = False
-    if manual:
-        i = "4"
-        main(i, manual)
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
     else:
-        if len(sys.argv) > 1:
-            i = sys.argv[1]
-            main(i, manual)
-        else:
-            print("Por favor, proporciona el nombre del archivo como argumento de línea de comandos.")
+        print("Por favor, proporciona un índice (0–4) como argumento de línea de comandos.")

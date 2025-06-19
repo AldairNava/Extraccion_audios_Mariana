@@ -21,10 +21,10 @@ pyautogui.FAILSAFE = False
 
 def find_zip_p_efgarciac(directory):
     """
-    Busca el primer archivo .zip en 'directory' cuyo nombre comience con 'cmanriquez'.
+    Busca el primer archivo .zip en 'directory' cuyo nombre comience con 'p-efgarciac'.
     Devuelve True si lo encuentra, False en caso contrario.
     """
-    prefijo = "cmanriquez"
+    prefijo = "p-efgarciac"
     for nombre in os.listdir(directory):
         base, ext = os.path.splitext(nombre)
 
@@ -181,13 +181,13 @@ def main(i, x,manual, intentos_fallidos):
         print("Ingresando usuario")
         user = driver.find_element(By.XPATH, usuario)
         user.click()
-        user.send_keys('cmanriquez')
+        user.send_keys('p-efgarciac')
         sleep(1)
 
         print("Ingresando contraseña")
         password = driver.find_element(By.XPATH, contraseña)
         password.click()
-        password.send_keys('cmojun22')
+        password.send_keys('14080')
         sleep(1)
 
         print("Iniciando sesión")
@@ -540,9 +540,17 @@ def main(i, x,manual, intentos_fallidos):
 
             directorio = r"C:\Users\Jotzi1\Downloads"
             resultado = find_zip_p_efgarciac(directorio)
-            while resultado:
+            contador = 0  # Inicializa el contador
+
+            while resultado and contador < 30:
                 print("Buscando...")
                 resultado = find_zip_p_efgarciac(directorio)
+                contador += 1
+
+            if contador == 30:
+                print(f"Finalizado después de 30 intentos no se logro descargar el archivo del horario {x} campaña {i}.")
+            else:
+                print("Descarga exitosa Procediendo a extraer")
 
             
             try:

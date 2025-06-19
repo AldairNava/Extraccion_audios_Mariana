@@ -92,7 +92,7 @@ def load_data_to_db(file_path, table_name):
                 cursor.execute(insert_query, row)
                 inserted_rows_count += 1
             except mysql.connector.Error as err:
-                # print(f"Error al insertar el registro: {row}. Error: {err}")
+                print(f"Error al insertar el registro: {row}. Error: {err}")
                 failed_rows_count += 1
 
         connection.commit()
