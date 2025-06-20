@@ -53,6 +53,10 @@ def ejecutar_tareas_con_valor():
     print("Iniciando la transcripcion")
     iniciar_proceso_transcripcion()
 
+    print("Validando Asignaciones")
+    send_msg("Validando Asignaciones")
+    subprocess.run(["python", "validacion_asignaciones.py"], check=True)
+
 def main():
     print("Esperando Horario de Ejecución Extracción Mariana...")
     schedule.every().monday.at("12:00").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
