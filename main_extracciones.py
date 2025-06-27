@@ -8,10 +8,10 @@ import requests
 
 def ejecutar_tareas_con_valor():
 
-    # print(f"\nIniciando proceso de extracción de audios cdmx_cuer con valor")
-    # send_msg("Iniciando la descarga de CDMX")
-    # subprocess.run(["python", "extraccion_speech_cdmx_cue.py"], check=True)
-    # time.sleep(5)
+    print(f"\nIniciando proceso de extracción de audios cdmx_cuer con valor")
+    send_msg("Iniciando la descarga de CDMX")
+    subprocess.run(["python", "extraccion_speech_cdmx_cue.py"], check=True)
+    time.sleep(5)
 
     print(f"\nIniciando proceso de extracción de audios apodaca con valor")
     send_msg("Iniciando la descarga de Apodaca")
@@ -88,5 +88,5 @@ def iniciar_proceso_transcripcion():
         
 
 if __name__ == "__main__":
-    main()
-    # ejecutar_tareas_con_valor()
+    # main()
+    ejecutar_tareas_con_valor()
