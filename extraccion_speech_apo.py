@@ -254,9 +254,21 @@ def main(i, x,manual, intentos_fallidos):
 
         # Diccionario con los horarios
         xpath = {
-            "2": {"hora": "2:00 pm", "xpath": dos_pm_1},
-            "3": {"hora": "5:00 pm", "xpath": cinco_pm_1},
-        }
+                "2": {"hora": "9:00 am", "xpath": nueve_am_1},
+                "3": {"hora": "10:00 am", "xpath": diez_am_1},
+                "4": {"hora": "11:00 am", "xpath": once_am_1},
+                "5": {"hora": "12:00 pm", "xpath": doce_pm_1},
+                "6": {"hora": "1:00 pm", "xpath": una_pm_1},
+                "7": {"hora": "2:00 pm", "xpath": dos_pm_1},
+                "8": {"hora": "3:00 pm", "xpath": tres_pm_1},
+                "9": {"hora": "4:00 pm", "xpath": cuatro_pm_1},
+                "10": {"hora": "5:00 pm", "xpath": cinco_pm_1},
+                "11": {"hora": "6:00 pm", "xpath": seis_pm_1},
+                "12": {"hora": "7:00 pm", "xpath": siete_pm_1},
+                "13": {"hora": "8:00 pm", "xpath": ocho_pm_1},
+                "14": {"hora": "9:00 pm", "xpath": nueve_pm_1},
+                "15": {"hora": "10:00 pm", "xpath": diez_pm_1}
+            }
 
         seleccionar_horario(driver, x, fecha_1, xpath)
 
@@ -298,10 +310,22 @@ def main(i, x,manual, intentos_fallidos):
                 print("Valor de x no válido. Proporcione un valor entre 0 y 10.")
         
         xpath = {
-            "1": {"hora": "10:00 am", "xpath": diez_am_2},
-            "2": {"hora": "5:00 pm", "xpath": cinco_pm_2},
-            "3": {"hora": "11:00 pm", "xpath": once_pm_2},
-        }
+                "1": {"hora": "9:00 am", "xpath": nueve_am_2},
+                "2": {"hora": "10:00 am", "xpath": diez_am_2},
+                "3": {"hora": "11:00 am", "xpath": once_am_2},
+                "4": {"hora": "12:00 pm", "xpath": doce_pm_2},
+                "5": {"hora": "1:00 pm", "xpath": una_pm_2},
+                "6": {"hora": "2:00 pm", "xpath": dos_pm_2},
+                "7": {"hora": "3:00 pm", "xpath": tres_pm_2},
+                "8": {"hora": "4:00 pm", "xpath": cuatro_pm_2},
+                "9": {"hora": "5:00 pm", "xpath": cinco_pm_2},
+                "10": {"hora": "6:00 pm", "xpath": seis_pm_2},
+                "11": {"hora": "7:00 pm", "xpath": siete_pm_2},
+                "12": {"hora": "8:00 pm", "xpath": ocho_pm_2},
+                "13": {"hora": "9:00 pm", "xpath": nueve_pm_2},
+                "14": {"hora": "10:00 pm", "xpath": diez_pm_2},
+                "15": {"hora": "11:00 pm", "xpath": once_pm_2}
+            }
         seleccionar_horario_final(driver, x, hora_a, xpath)
 
         # ********** SELECCION DE RANGO DE FECHAS
@@ -367,20 +391,14 @@ def main(i, x,manual, intentos_fallidos):
         rango_llamada_1 = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[4]/div/value-range-field-search/div/div/input[1]')
         rango_llamada_1.click()
         sleep(2)
-        if x == '1':
-            rango_llamada_1.send_keys('200')
-        else:
-            rango_llamada_1.send_keys('600')
+        rango_llamada_1.send_keys('200')
         sleep(2)
         
         print("rango 2")
         rango_llamada_2 = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[4]/div/value-range-field-search/div/div/input[2]')
         rango_llamada_2.click()
         sleep(2)
-        if x == '1':
-            rango_llamada_2.send_keys('600')   
-        else:
-            rango_llamada_2.send_keys('1200')
+        rango_llamada_2.send_keys('1200')
         sleep(2)
         
         print("Busqueda de audios iniciada")
@@ -393,9 +411,8 @@ def main(i, x,manual, intentos_fallidos):
         
         # ********** VENTANA DE EXPORTACION
         
-        sleep(20)
-        validar_elemento_presentes(driver, i, x, manual,reconocimiento, intentos_fallidos)
-        sleep(20)
+        # sleep(20)
+        # validar_elemento_presentes(driver, i, x, manual,reconocimiento, intentos_fallidos)
         
         try:
             print("Esperando a que el checkbox de reconocimiento esté presente y sea clickeable")
@@ -536,19 +553,19 @@ def main(i, x,manual, intentos_fallidos):
             hora_actual = datetime.datetime.now().strftime("%H:%M:%S")
             print("Esperando las Descargar por 30 min hora actual:", hora_actual)
             print("Esperando la descarga.......")
-            sleep(400)
+            sleep(600)
 
             directorio = r"C:\Users\Jotzi1\Downloads"
             resultado = find_zip_p_efgarciac(directorio)
             contador = 0  # Inicializa el contador
 
-            while resultado and contador < 30:
+            while resultado and contador < 40:
                 print("Buscando...")
                 resultado = find_zip_p_efgarciac(directorio)
                 contador += 1
 
-            if contador == 30:
-                print(f"Finalizado después de 30 intentos no se logro descargar el archivo del horario {x} campaña {i}.")
+            if contador == 40:
+                print(f"Finalizado después de 40 intentos no se logro descargar el archivo del horario {x} campaña {i}.")
             else:
                 print("Descarga exitosa Procediendo a extraer")
 
@@ -611,7 +628,7 @@ def main(i, x,manual, intentos_fallidos):
 
 
 if __name__ == '__main__':
-    horarios=["1","2","3"]
+    horarios = ["4","5","6","7","8","9","10","11"]
     intentos_fallidos = {}
 
     for x in horarios:

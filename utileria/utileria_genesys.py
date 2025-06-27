@@ -54,23 +54,38 @@ expacion_exportar = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div[2]/div[1
 # HORAS DE EXTRACCION
 
 #HORARIOS DE 1:
-doce_am_1 ='/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[1]/a'
-siete_am_1 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[8]/a'
+nueve_am_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[10]/a'
+diez_am_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[11]/a'
+once_am_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[12]/a'
+doce_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[13]/a'
 una_pm_1 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[14]/a'
 dos_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[15]/a'
+tres_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[16]/a'
+cuatro_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[17]/a'
 cinco_pm_1 ='/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[18]/a'
 seis_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[19]/a'
+siete_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[20]/a'
 ocho_pm_1 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[21]/a'
+nueve_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[22]/a'
+diez_pm_1='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[23]/a'
 once_pm_1 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[2]/div/div/dropdown-select/div/div/ul/li[24]/a'
 
 
 #HORARIOS A 2:
+nueve_am_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[10]/a'
 diez_am_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[11]/a'
-siete_am_2 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[8]/a'
+once_am_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[12]/a'
+doce_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[13]/a'
 una_pm_2 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[14]/a'
+dos_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[15]/a'
+tres_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[16]/a'
+cuatro_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[17]/a'
 cinco_pm_2 ='/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[18]/a'
+seis_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[19]/a'
+siete_pm_2 = '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[20]/a'
 ocho_pm_2 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[21]/a'
+nueve_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[22]/a'
+diez_pm_2='/html/body/div/div[4]/div/div[3]/div[3]/div/div[1]/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[23]/a'
 once_pm_2 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[24]/a'
-doce_am_1 = '/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[1]/div/div[4]/div/div/dropdown-select/div/div/ul/li[1]/a'
 
 

@@ -29,7 +29,7 @@ def obtener_nombres_asignados():
             SELECT audio_name 
             FROM audios 
             WHERE status IN ('not found audio', 'Asignado') 
-            AND DATE(fecha_llamada) = DATE_SUB(CURDATE(), INTERVAL 3 DAY);
+            AND DATE(fecha_llamada) >= DATE_SUB(CURDATE(), INTERVAL 3 DAY);
         """)
         resultados = cursor.fetchall()
         return [fila[0] for fila in resultados]
