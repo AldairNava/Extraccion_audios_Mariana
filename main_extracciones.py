@@ -8,73 +8,73 @@ import requests
 
 def ejecutar_tareas_con_valor():
 
-    msg:f"\nLimpiando carpetas"
+    msg =f"\nLimpiando carpetas"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "eliminar_rar.py"], check=True)
 
-    msg:f"\nLimpiando tablas"
+    msg =f"\nLimpiando tablas"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "truncate.py"], check=True)
 
-    msg:f"\nIniciando Extracción CDMX"
+    msg =f"\nIniciando Extracción CDMX"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "extraccion_speech_cdmx_cue.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nIniciando Extracción de audios apodaca"
+    msg =f"\nIniciando Extracción de audios apodaca"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "extraccion_speech_apo.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nEvitando posible duplicidad"
+    msg =f"\nEvitando posible duplicidad"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "evitar_duplicidad.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nInsertando registros para Avena"
+    msg =f"\nInsertando registros para Avena"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "insertar_reporte_avena.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nEjecutando procedimientos almacensado Mariana"
+    msg =f"\nEjecutando procedimientos almacensado Mariana"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "Procesos_MySQL.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nEjecutando procedimientos almacenados Avena"
+    msg =f"\nEjecutando procedimientos almacenados Avena"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "ProcesoMSQL_avena.py"], check=True)
     time.sleep(5)
 
-    msg:f"\nSubiendo audios avena"
+    msg =f"\nSubiendo audios avena"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "mover_audios_filtrados_avena.py"], check=True)
 
-    msg:f"\nSubiendo audias mariana"
+    msg =f"\nSubiendo audias mariana"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "mover_audios_filtrados.py"], check=True)
 
-    msg:f"\nactualizando not found"
+    msg =f"\nactualizando not found"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "buscar_ftp.py"], check=True)
 
-    msg:f"\niniciando transcripcion"
+    msg =f"\niniciando transcripcion"
     print(msg)
     send_msg(msg)
     iniciar_proceso_transcripcion()
 
-    msg:f"\nvalidando asignaciones"
+    msg =f"\nvalidando asignaciones"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "validacion_asignaciones.py"], check=True)
