@@ -435,9 +435,17 @@ def main(i, x,manual, intentos_fallidos):
                 
                 print("\nAccediendo a ventana modal 1 seleccion de audios")
             except Exception as e:
-                print(f"Ocurrió un error: {e}")
-                main(i, x, manual, intentos_fallidos)
-                return
+                intentos_actuales += 1
+                intentos_fallidos[iteraccion] = intentos_actuales
+                if intentos_actuales < 5:
+                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    main(i, x, manual, intentos_fallidos)
+                    return
+                else:
+                    msg = f"⚠️ Error persistente tras 5 intentos. Falló en interacción x={x}, Campaña i={i}. Deteniendo proceso."
+                    print(msg)
+                    send_msg(msg)
+                    sys.exit(1)
 
             try:
                 print("Esperando a que la primer ventana modal esté visible")
@@ -485,9 +493,17 @@ def main(i, x,manual, intentos_fallidos):
 
 
             except Exception as e:
-                print(f"Ocurrió un error: {e}")
-                main(i, x, manual, intentos_fallidos)
-                return
+                intentos_actuales += 1
+                intentos_fallidos[iteraccion] = intentos_actuales
+                if intentos_actuales < 5:
+                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    main(i, x, manual, intentos_fallidos)
+                    return
+                else:
+                    msg = f"⚠️ Error persistente tras 5 intentos. Falló en interacción x={x}, Campaña i={i}. Deteniendo proceso."
+                    print(msg)
+                    send_msg(msg)
+                    sys.exit(1)
                 
                 
             # ********** VENTANA DE EXPORTACION MODAL 2
@@ -530,9 +546,17 @@ def main(i, x,manual, intentos_fallidos):
                 sleep(2)
                 
             except Exception as e:
-                print(f"Ocurrió un error: {e}")
-                main(i, x, manual, intentos_fallidos)
-                return
+                intentos_actuales += 1
+                intentos_fallidos[iteraccion] = intentos_actuales
+                if intentos_actuales < 5:
+                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    main(i, x, manual, intentos_fallidos)
+                    return
+                else:
+                    msg = f"⚠️ Error persistente tras 5 intentos. Falló en interacción x={x}, Campaña i={i}. Deteniendo proceso."
+                    print(msg)
+                    send_msg(msg)
+                    sys.exit(1)
                 
             
             # ********** VENTANA DE EXPORTACION MODAL 3
@@ -548,9 +572,17 @@ def main(i, x,manual, intentos_fallidos):
 
                 sleep(20)
             except Exception as e:
-                print(f"Ocurrió un error: {e}")
-                main(i, x, manual, intentos_fallidos)
-                return
+                intentos_actuales += 1
+                intentos_fallidos[iteraccion] = intentos_actuales
+                if intentos_actuales < 5:
+                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    main(i, x, manual, intentos_fallidos)
+                    return
+                else:
+                    msg = f"⚠️ Error persistente tras 5 intentos. Falló en interacción x={x}, Campaña i={i}. Deteniendo proceso."
+                    print(msg)
+                    send_msg(msg)
+                    sys.exit(1)
                 
             try:
                 print("Esperando a que el botón 'Completado' esté presente y sea clickeable")
@@ -632,18 +664,13 @@ def main(i, x,manual, intentos_fallidos):
 
 
 if __name__ == '__main__':
-    horarios = ["4","5","6","7","8","9","10","11"]
+    horarios = ["1","2","3","4","5","6","7","8","9","10"]
     intentos_fallidos = {}
 
     for x in horarios:
-        # if x == "1":
-        #     send_msg("Iniciando horario 1 de 00:00am a 12:00pm CDMX")
-        # elif x == "2":
-        #     send_msg("Iniciando horario 2 de 12:00pm a 06:00pm CDMX")
-        # elif x == "3":
-        #     send_msg("Iniciando horario 3 de 06:00pm a 11:00pm CDMX")
         
         for i in range(3):
             manual = True
             print("\nValor de iteración cdmx-cuernavaca: ", i)
+            send_msg(f"Iniciando Extraccion de Horario:{x} CDMX para iteraccion {i}")
             main(i, x, manual, intentos_fallidos)

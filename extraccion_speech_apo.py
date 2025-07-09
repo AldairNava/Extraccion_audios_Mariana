@@ -628,7 +628,7 @@ def main(i, x,manual, intentos_fallidos):
 
 
 if __name__ == '__main__':
-    horarios = ["4","5","6","7","8","9","10","11"]
+    horarios = ["4","5","6","7","8","9","10"]
     intentos_fallidos = {}
 
     for x in horarios:
