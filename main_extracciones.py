@@ -8,7 +8,12 @@ import requests
 
 def ejecutar_tareas_con_valor():
 
-    msg =f"\nLimpiando carpetas"
+    msg =f"\nLimpiando carpetas de audios"
+    print(msg)
+    send_msg(msg)
+    subprocess.run(["python", "eliminar_audios.py"], check=True)
+
+    msg =f"\nLimpiando carpetas raw"
     print(msg)
     send_msg(msg)
     subprocess.run(["python", "eliminar_rar.py"], check=True)
@@ -24,11 +29,11 @@ def ejecutar_tareas_con_valor():
     subprocess.run(["python", "extraccion_speech_cdmx_cue.py"], check=True)
     time.sleep(5)
 
-    msg =f"\nIniciando Extracción de audios apodaca"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "extraccion_speech_apo.py"], check=True)
-    time.sleep(5)
+    # msg =f"\nIniciando Extracción de audios apodaca"
+    # print(msg)
+    # send_msg(msg)
+    # subprocess.run(["python", "extraccion_speech_apo.py"], check=True)
+    # time.sleep(5)
 
     msg =f"\nEvitando posible duplicidad"
     print(msg)
@@ -83,7 +88,6 @@ def main():
     print("Esperando Horario de Ejecución Extracción Mariana...")
     schedule.every().monday.at("12:00").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
     schedule.every().monday.at("12:01").do(lambda: subprocess.run(["python", "Update_asignaciones_avena.py"], check=True))
-    schedule.every().monday.at("12:02").do(lambda: subprocess.run(["python", "eliminar_audios.py"], check=True))
     schedule.every().day.at("00:00").do(ejecutar_tareas_con_valor)
 
     while True:
