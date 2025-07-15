@@ -2,7 +2,7 @@ import os
 import subprocess
 import schedule
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from Tele import send_msg
 import requests
 
@@ -12,7 +12,7 @@ def ejecutar_tareas_con_valor():
         ("Limpiando carpetas raw",                "eliminar_rar.py",               1),
         ("Limpiando tablas",                      "truncate.py",                   1),
         ("Iniciando Extracción CDMX",             "extraccion_speech_cdmx_cue.py", 5),
-        ("Iniciando Extracción de audios apodaca","extraccion_speech_apo.py",      5),
+        # ("Iniciando Extracción de audios apodaca","extraccion_speech_apo.py",      5),
         ("Evitando posible duplicidad",           "evitar_duplicidad.py",          5),
         ("Insertando registros para Avena",       "insertar_reporte_avena.py",     5),
         ("Ejecutando procedimientos almacenado Mariana","Procesos_MySQL.py",      5),

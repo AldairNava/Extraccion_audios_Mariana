@@ -62,7 +62,6 @@ def mover_y_extraer(nombre_prefijo, carpeta_destino, contrasenas):
     print(f"No se encontró ningún ZIP con prefijo '{nombre_prefijo}' en Descargas.")
 
 def main(i):
-    nombre_prefijo = "p-efgarciac"
     carpetas = {
         '0': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\servicios_rar",
         '1': r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\soporte_rar",
@@ -76,6 +75,11 @@ def main(i):
     if not carpeta_destino:
         print(f"El valor '{i}' no es válido. Usa un número entre 0 y 4.")
         return
+    
+    if i in ('0', '1', '2'):
+        nombre_prefijo = "p-efgarciac"
+    else:
+        nombre_prefijo = "cmanriquez"
 
     mover_y_extraer(nombre_prefijo, carpeta_destino, contrasenas)
 

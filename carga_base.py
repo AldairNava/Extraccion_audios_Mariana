@@ -56,7 +56,13 @@ def load_data_to_db(file_path, table_name):
     for _, row in df.iterrows():
         external_id = str(row["External_ID"])
         if audio_valido(external_id):
-            registros_validos.append(tuple(row))
+            valores = []
+            for v in row:
+                if pd.isna(v):
+                    valores.append(None)
+                else:
+                    valores.append(v)
+            registros_validos.append(tuple(valores))
         else:
             omitidos += 1
 
