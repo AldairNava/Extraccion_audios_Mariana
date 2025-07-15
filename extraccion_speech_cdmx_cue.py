@@ -153,7 +153,7 @@ def main(i, x,manual, intentos_fallidos):
         opciones = webdriver.ChromeOptions()
         opciones.add_argument('--ignore-certificate-errors') 
         opciones.add_experimental_option("excludeSwitches", ['enable-automation']) 
-        # opciones.add_argument("--headless")  
+        opciones.add_argument("--headless")  
         opciones.add_argument("--disable-extensions")  
         opciones.add_argument("--disable-gpu")  
         opciones.add_argument("--no-sandbox")  

@@ -151,7 +151,15 @@ def main(i, x,manual, intentos_fallidos):
     try:
         opciones = webdriver.ChromeOptions()
         opciones.add_argument('--ignore-certificate-errors') 
-        opciones.add_experimental_option("excludeSwitches", ['enable-automation'])
+        opciones.add_experimental_option("excludeSwitches", ['enable-automation']) 
+        opciones.add_argument("--headless")  
+        opciones.add_argument("--disable-extensions")  
+        opciones.add_argument("--disable-gpu")  
+        opciones.add_argument("--no-sandbox")  
+        opciones.add_argument("--log-level=3")  
+        opciones.add_argument("--ignore-certificate-errors")  
+        opciones.add_argument("--disable-software-rasterizer")  
+        opciones.add_argument("--disable-logging") 
         driver = webdriver.Chrome(options=opciones)
 
         driver.maximize_window()
