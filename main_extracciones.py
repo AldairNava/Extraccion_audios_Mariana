@@ -7,92 +7,36 @@ from Tele import send_msg
 import requests
 
 def ejecutar_tareas_con_valor():
+    tareas = [
+        ("Limpiando carpetas de audios",          "eliminar_audios.py",            1),
+        ("Limpiando carpetas raw",                "eliminar_rar.py",               1),
+        ("Limpiando tablas",                      "truncate.py",                   1),
+        ("Iniciando Extracción CDMX",             "extraccion_speech_cdmx_cue.py", 5),
+        ("Iniciando Extracción de audios apodaca","extraccion_speech_apo.py",      5),
+        ("Evitando posible duplicidad",           "evitar_duplicidad.py",          5),
+        ("Insertando registros para Avena",       "insertar_reporte_avena.py",     5),
+        ("Ejecutando procedimientos almacenado Mariana","Procesos_MySQL.py",      5),
+        ("Ejecutando procedimientos almacenados Avena","ProcesoMSQL_avena.py",      5),
+        ("Subiendo audios avena",                 "mover_audios_filtrados_avena.py", 1),
+        ("Subiendo audios mariana",               "mover_audios_filtrados.py",     1),
+        ("Actualizando not found",                "buscar_ftp.py",                 1),
+    ]
+    
+    for descripcion, script, delay in tareas:
+        msg = f"\n{descripcion}"
+        print(msg)
+        send_msg(msg)
+        subprocess.run(["python", script], check=True)
+        if delay:
+            time.sleep(delay)
 
-    msg =f"\nLimpiando carpetas de audios"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "eliminar_audios.py"], check=True)
-
-    msg =f"\nLimpiando carpetas raw"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "eliminar_rar.py"], check=True)
-
-    msg =f"\nLimpiando tablas"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "truncate.py"], check=True)
-
-    msg =f"\nIniciando Extracción CDMX"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "extraccion_speech_cdmx_cue.py"], check=True)
-    time.sleep(5)
-
-    # msg =f"\nIniciando Extracción de audios apodaca"
-    # print(msg)
-    # send_msg(msg)
-    # subprocess.run(["python", "extraccion_speech_apo.py"], check=True)
-    # time.sleep(5)
-
-    msg =f"\nEvitando posible duplicidad"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "evitar_duplicidad.py"], check=True)
-    time.sleep(5)
-
-    msg =f"\nInsertando registros para Avena"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "insertar_reporte_avena.py"], check=True)
-    time.sleep(5)
-
-    msg =f"\nEjecutando procedimientos almacensado Mariana"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "Procesos_MySQL.py"], check=True)
-    time.sleep(5)
-
-    msg =f"\nEjecutando procedimientos almacenados Avena"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "ProcesoMSQL_avena.py"], check=True)
-    time.sleep(5)
-
-    msg =f"\nSubiendo audios avena"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "mover_audios_filtrados_avena.py"], check=True)
-
-    msg =f"\nSubiendo audias mariana"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "mover_audios_filtrados.py"], check=True)
-
-    msg =f"\nactualizando not found"
-    print(msg)
-    send_msg(msg)
-    subprocess.run(["python", "buscar_ftp.py"], check=True)
-
-    msg =f"\niniciando transcripcion"
-    print(msg)
-    send_msg(msg)
+    print("\nIniciando transcripción")
+    send_msg("\nIniciando transcripción")
     iniciar_proceso_transcripcion()
 
-    msg =f"\nvalidando asignaciones"
-    print(msg)
-    send_msg(msg)
+    print("\nValidando asignaciones")
+    send_msg("\nValidando asignaciones")
     subprocess.run(["python", "validacion_asignaciones.py"], check=True)
-
-def main():
-    print("Esperando Horario de Ejecución Extracción Mariana...")
-    schedule.every().monday.at("12:00").do(lambda: subprocess.run(["python", "update_asignaciones.py"], check=True))
-    schedule.every().monday.at("12:01").do(lambda: subprocess.run(["python", "Update_asignaciones_avena.py"], check=True))
-    schedule.every().day.at("00:00").do(ejecutar_tareas_con_valor)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
 
 def iniciar_proceso_transcripcion():
     url = "http://192.168.51.167:5000/iniciarProcesoTranscripcion"
@@ -112,5 +56,11 @@ def iniciar_proceso_transcripcion():
         
 
 if __name__ == "__main__":
-    # main()
+    if datetime.now().weekday() == 1:
+        print("Hoy es martes: ejecutando asignaciones...")
+        subprocess.run(["python", "update_asignaciones.py"], check=True)
+        subprocess.run(["python", "Update_asignaciones_avena.py"], check=True)
+    else:
+        print("No es martes: se omite las asiganciones.")
+
     ejecutar_tareas_con_valor()
