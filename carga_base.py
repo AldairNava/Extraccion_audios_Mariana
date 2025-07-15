@@ -1,163 +1,146 @@
-import sys
 import os
+import sys
+import threading
 import pandas as pd
 import mysql.connector
-import threading
 from send2trash import send2trash
 
-# Carpetas donde buscar los audios
-AUDIO_FOLDERS = [
-    r"carpeta_de_audios/audios_filtrados",
-    r"carpeta_de_audios/audios_rar_retenciones",
-    r"carpeta_de_audios/audios_rar_servicios",
-    r"carpeta_de_audios/audios_rar_servicios_apo",
-    r"carpeta_de_audios/audios_rar_soporte",
-    r"carpeta_de_audios/audios_rar_soporte_apo"
-]
+# ——— Configuración ———
 BASE_AUDIO_PATH = r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana"
 
-def find_csv_file(directory):
-    for file in os.listdir(directory):
-        if file.endswith(".csv"):
-            return os.path.join(directory, file)
+# Subcarpetas donde buscar MP3
+AUDIO_SUBFOLDERS = [
+    "audios_filtrados",
+    "audios_rar_retenciones",
+    "audios_rar_servicios",
+    "audios_rar_servicios_apo",
+    "audios_rar_soporte",
+    "audios_rar_soporte_apo",
+]
+
+# Pares (subcarpeta_de_datos, tabla_destino)
+DATA_FOLDERS = [
+    ("archivos_rar/servicios_rar",            "reporte_audios_servicios"),
+    ("archivos_rar/soporte_rar",              "reporte_audios_soporte"),
+    ("archivos_rar/retenciones_rar",          "reporte_audios_retenciones"),
+    ("archivos_rar/servicios_apodaca_rar",    "reporte_audios_servicios_apodaca"),
+    ("archivos_rar/soporte_apodaca_rar",      "reporte_audios_soporte_apodaca"),
+]
+
+DB_CONFIG = {
+    "host": "192.168.51.210",
+    "user": "root",
+    "password": "",
+    "database": "audios_dana",
+    "connection_timeout": 90,
+}
+
+# ——— Funciones auxiliares ———
+def find_csv_file(directory: str) -> str | None:
+    """Busca un único .csv en el directorio y devuelve su ruta."""
+    for fn in os.listdir(directory):
+        if fn.lower().endswith(".csv"):
+            return os.path.join(directory, fn)
     return None
 
-def buscar_audio(external_id):
-    for carpeta in AUDIO_FOLDERS:
-        ruta = os.path.join(BASE_AUDIO_PATH, carpeta, f"{external_id}.mp3")
-        if os.path.isfile(ruta):
-            return ruta
-    return None
-
-def audio_valido(external_id):
-    ruta_audio = buscar_audio(external_id)
-    if ruta_audio and os.path.getsize(ruta_audio) >= 5 * 1024:
-        return True
+def audio_valido(external_id: str) -> bool:
+    """Comprueba si existe un .mp3 ≥ 5KB para el ID dado."""
+    for sub in AUDIO_SUBFOLDERS:
+        path = os.path.join(BASE_AUDIO_PATH, sub, f"{external_id}.mp3")
+        if os.path.isfile(path) and os.path.getsize(path) >= 5 * 1024:
+            return True
     return False
 
-def load_data_to_db(file_path, table_name):
-    if not file_path:
-        print("No se encontró ningún archivo .csv en el directorio especificado.")
-        return
-    
-    df = pd.read_csv(file_path)
-    
-    # Seleccionar las columnas necesarias como en el primer script
-    columns_to_keep = ["External ID", "Interaction Time", "Duration", "Metadata: agentId", 
-                       "Metadata: Cuenta", "Metadata: CasoNegocio"]
-    df = df[columns_to_keep]
+def load_data_to_db(csv_path: str, table: str) -> None:
+    """Carga datos filtrados desde CSV a MySQL, maneja NaN → NULL y borra el CSV al final."""
+    # Leer solo columnas necesarias
+    cols = ["External ID", "Interaction Time", "Duration",
+            "Metadata: agentId", "Metadata: Cuenta", "Metadata: CasoNegocio"]
+    df = pd.read_csv(csv_path, usecols=cols)
+    df.columns = ["External_ID", "Interaction_Time", "Duration",
+                  "Metadata_agentId", "Metadata_Cuenta", "Metadata_CasoNegocio"]
 
-    # Renombrar las columnas para coincidir con los nombres de la base de datos
-    df.columns = ["External_ID", "Interaction_Time", "Duration", "Metadata_agentId", "Metadata_Cuenta", "Metadata_CasoNegocio"]
+    # Convertir todos los NaN a None para que sean NULL en MySQL
+    df = df.where(pd.notna(df), None)
 
-    # Filtrar registros según existencia y tamaño del audio
-    registros_validos = []
-    omitidos = 0
-    for _, row in df.iterrows():
-        external_id = str(row["External_ID"])
-        if audio_valido(external_id):
-            valores = []
-            for v in row:
-                if pd.isna(v):
-                    valores.append(None)
-                else:
-                    valores.append(v)
-            registros_validos.append(tuple(valores))
-        else:
-            omitidos += 1
+    # Filtrar solo filas cuyo audio sea válido
+    registros = [
+        (row.External_ID,
+         row.Interaction_Time,
+         row.Duration,
+         row.Metadata_agentId,
+         row.Metadata_Cuenta,
+         row.Metadata_CasoNegocio)
+        for _, row in df.iterrows()
+        if audio_valido(str(row.External_ID))
+    ]
+    omitidos = len(df) - len(registros)
 
-    # Aquí configuramos el temporizador de 90 segundos
-    def timeout():
-        print("No es posible establecer conexión a la base de datos. El tiempo de espera fue mayor a 90 segundos.")
-        sys.exit()
-
-    timer = threading.Timer(90.0, timeout)
+    # Temporizador de timeout para la conexión
+    timer = threading.Timer(90.0, lambda: (print("Timeout: no se conectó a la BD en 90's."), sys.exit()))
     timer.start()
 
     try:
-        connection = mysql.connector.connect(
-            host="192.168.51.210",
-            user="root",
-            password="",
-            database="audios_dana",
-            connection_timeout=90  # Establece un tiempo de espera de 90 segundos
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        query = (
+            f"INSERT INTO {table} "
+            "(External_ID, Interaction_Time, Duration, Metadata_agentId, Metadata_Cuenta, Metadata_CasoNegocio) "
+            "VALUES (%s, %s, %s, %s, %s, %s)"
         )
-        cursor = connection.cursor()
 
-        insert_query = f"""
-        INSERT INTO {table_name} (External_ID, Interaction_Time, Duration, Metadata_agentId, Metadata_Cuenta, Metadata_CasoNegocio)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """
-
-        inserted_rows_count = 0  # Inicializar el contador
-        failed_rows_count = 0  # Contador de registros fallidos
-
-        print("tabla definida e insertando registros...")
-        for row in registros_validos:
+        insertados = fallidos = 0
+        print(f"Iniciando inserción en tabla `{table}`...")
+        for row in registros:
             try:
-                cursor.execute(insert_query, row)
-                inserted_rows_count += 1
-            except mysql.connector.Error as err:
-                print(f"Error al insertar el registro: {row}. Error: {err}")
-                failed_rows_count += 1
+                cursor.execute(query, row)
+                insertados += 1
+            except mysql.connector.Error as e:
+                print(f"  ❌ Error al insertar {row}: {e}")
+                fallidos += 1
 
-        connection.commit()
-
+        conn.commit()
+        print(f"✅ Insertados: {insertados}, ❌ Fallidos: {fallidos}, ⚠️ Omitidos: {omitidos}")
         cursor.close()
-        connection.close()
-
-        print(f"Se insertaron {inserted_rows_count} registros en la tabla {table_name}.")
-        print(f"Fallaron {failed_rows_count} registros durante la inserción.")
-        print(f"Se omitieron {omitidos} registros por audio no encontrado o menor a 5KB.")
-    except mysql.connector.Error as err:
-        print(f"Error al conectar a la base de datos: {err}")
+        conn.close()
+    except mysql.connector.Error as e:
+        print(f"Error de conexión o SQL: {e}")
     finally:
         timer.cancel()
 
+    # Mover el CSV a la papelera
     try:
-        print("mandando a papeleria archivo")
-        send2trash(file_path)
-        print(f"Archivo {file_path} eliminado exitosamente.")
+        send2trash(csv_path)
+        print(f"📁 Archivo enviado a papelera: {csv_path}")
     except Exception as e:
-        print(f"Error al eliminar el archivo {file_path}: {str(e)}")
+        print(f"Error al eliminar CSV: {e}")
 
-def main(i):
-    directories = [
-        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\servicios_rar",
-        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\soporte_rar",
-        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\retenciones_rar",
-        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\servicios_apodaca_rar",
-        r"C:\Users\Jotzi1\Desktop\Extraccion_audios_Mariana\archivos_rar\soporte_apodaca_rar"
-    ]
-    
-    table_names = [
-        "reporte_audios_servicios",
-        "reporte_audios_soporte",
-        "reporte_audios_retenciones",
-        "reporte_audios_servicios_apodaca",
-        "reporte_audios_soporte_apodaca"
-    ]
-    
-    if 0 <= int(i) < len(directories):
-        print("buscando archivo")
-        directory = directories[int(i)]
-        file_path = find_csv_file(directory)
-        if file_path:
-            print("archivo encontrado subiendo registros...")
-            load_data_to_db(file_path, table_names[int(i)])
-        else:
-            print(f"No se encontró ningún archivo .csv en el directorio {directory}.")
+def main(arg: str) -> None:
+    """Punto de entrada: recibe índice 0–4, procesa el CSV correspondiente."""
+    try:
+        idx = int(arg)
+    except ValueError:
+        print("El argumento debe ser un número entero (0–4).")
+        return
+
+    if not (0 <= idx < len(DATA_FOLDERS)):
+        print("Índice fuera de rango. Debe ser entre 0 y 4.")
+        return
+
+    subcarpeta, tabla = DATA_FOLDERS[idx]
+    directorio = os.path.join(BASE_AUDIO_PATH, subcarpeta)
+    print(f"🔍 Buscando CSV en: {directorio}")
+    csv_file = find_csv_file(directorio)
+
+    if csv_file:
+        print(f"✅ CSV encontrado: {csv_file}\n→ Cargando a `{tabla}`...")
+        load_data_to_db(csv_file, tabla)
     else:
-        print("Valor de i no válido. Debe estar entre 0 y 4.")
+        print(f"❌ No se encontró ningún CSV en {directorio}.")
 
+# ——— Ejecución como script ———
 if __name__ == "__main__":
-    manaul=False
-    if manaul==True:
-        i=2
-        main(i)
+    if len(sys.argv) != 2:
+        print("Uso: python script.py <índice 0–4>")
     else:
-        if len(sys.argv) > 1:
-            i = sys.argv[1]
-            main(i)
-        else:
-            print("Por favor, proporciona el nombre del archivo como argumento de línea de comandos.")
+        main(sys.argv[1])
