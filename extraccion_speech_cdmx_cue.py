@@ -757,18 +757,6 @@ HORARIOS = {
     "15": "11:00 pm",
 }
 
-# def iniciar_proceso_transcripcion():
-#     url = "http://192.168.51.167:5000/iniciarProcesoTranscripcion"
-#     try:
-#         response = requests.get(url)
-#         if response.status_code == 200:
-#             print("Correcto")
-#         else:
-#             print(f"Error: Código de estado {response.status_code}")
-#             send_msg(f"Error al mandar a Transcribir {response.status_code}")
-#     except requests.exceptions.RequestException as e:
-#         print(f"Error al realizar la solicitud: {e}")
-
 def parse_hora_hoy(hora_str: str):
     h = datetime.datetime.strptime(hora_str.upper(), "%I:%M %p").time()
     hoy = datetime.datetime.now().date()

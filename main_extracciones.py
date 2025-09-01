@@ -1,6 +1,7 @@
 import subprocess
 import threading
 import time
+import requests
 from datetime import datetime
 from Tele import send_msg
 
@@ -17,7 +18,6 @@ def ejecutar_tareas_con_valor():
     ]
     for descripcion, script, delay in iniciales:
         print(f"\n{descripcion}")
-        # send_msg(f"\n{descripcion}")
         lanzar_script(script)
         time.sleep(delay)
 
@@ -36,6 +36,19 @@ def ejecutar_tareas_con_valor():
     for t in threads:
         t.join()
 
+    iniciar_proceso_transcripcion()
+
+def iniciar_proceso_transcripcion():
+    url = "http://192.168.51.167:5000/iniciarProcesoTranscripcion"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print("Correcto")
+        else:
+            print(f"Error: Código de estado {response.status_code}")
+            send_msg(f"Error al mandar a Transcribir {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error al realizar la solicitud: {e}")
 
 if __name__ == "__main__":
     # Asignaciones solo los martes (weekday()==1)
