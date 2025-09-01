@@ -786,17 +786,16 @@ def dormir_hasta(dt_obj: datetime):
 def run_por_horario(main, send_msg):
     horarios_keys = ["3","4","5","6","7","8","9","10","11","12"]
     intentos_fallidos = {}
-    manual = True
+    manual = False
     EJECUTAR_SI_PASADO = True
 
     for idx, x in enumerate(horarios_keys):
         hora_str = HORARIOS[x]
-        # Determina el horario final (siguiente en la lista, si existe)
         if idx + 1 < len(horarios_keys):
             x_sig = horarios_keys[idx + 1]
             hora_final = HORARIOS[x_sig]
         else:
-            hora_final = "--:--"  # Último horario, sin final
+            hora_final = "--:--" 
 
         objetivo = parse_hora_hoy(hora_str)
         ahora = datetime.datetime.now()
