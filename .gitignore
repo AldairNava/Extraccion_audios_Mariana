@@ -1,0 +1,21 @@
+# 1) Ignorar todo el contenido de los __pycache__ (mantener la carpeta, pero no sus archivos)
+__pycache__/
+utileria/__pycache__/
+
+# 2) Ignorar sólo lo que esté dentro de estas carpetas de audios (no la carpeta padre)
+carpeta_de_audios/audios_filtrados/**
+carpeta_de_audios/audios_rar_retenciones/**
+carpeta_de_audios/audios_rar_servicios/**
+carpeta_de_audios/audios_rar_servicios_apo/**
+carpeta_de_audios/audios_rar_soporte/**
+carpeta_de_audios/audios_rar_soporte_apo/**
+carpeta_de_audios/audios_rar_soporte_apo/**
+carpeta_de_audios/audios_rar_televentas/**
+
+# 3) Ignorar sólo lo que esté dentro de estas carpetas de archivos_rar (no la carpeta padre)
+archivos_rar/retenciones_rar/**
+archivos_rar/servicios_apodaca_rar/**
+archivos_rar/servicios_rar/**
+archivos_rar/soporte_apodaca_rar/**
+archivos_rar/soporte_rar/**
+archivos_rar/televentas_rar/**
