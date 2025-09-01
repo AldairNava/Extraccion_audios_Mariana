@@ -55,7 +55,7 @@ if __name__ == "__main__":
     if datetime.now().weekday() == 1:
         print("Hoy es martes: ejecutando asignaciones...")
         lanzar_script("update_asignaciones.py")
-        # subprocess.run(["python", "limpiar_Ftp.py"])
+        subprocess.run(["python", "limpiar_Ftp.py"])
     else:
         print("No es martes: se omiten las asignaciones.")
 
