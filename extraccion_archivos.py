@@ -104,7 +104,7 @@ def main(i):
         print(f"El valor '{i}' no es válido. Usa un número entre 0 y 5.")
         return
 
-    nombre_prefijo = 'p-efgarciac' if i in ('0', '1', '2') else 'p-cmanriquez'
+    nombre_prefijo = 'p-efgarciac' if i in ('0', '1', '2','3') else 'cmanriquez'
     mover_y_extraer(nombre_prefijo, carpeta_destino, contrasenas)
 
 if __name__ == "__main__":

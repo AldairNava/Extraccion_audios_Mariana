@@ -31,10 +31,10 @@ def find_zip_p_efgarciac(directory):
         base, ext = os.path.splitext(nombre)
 
         if ext.lower() == ".zip" and base.startswith(prefijo):
-            print("Zip encontrado:", nombre)
+            print("CDMX:Zip encontrado:", nombre)
             return False
     
-    print("Zip No Encontrado")
+    print("CDMX:Zip No Encontrado")
     time.sleep(90)
     return True
 
@@ -48,22 +48,22 @@ def validar_elemento_presentes(driver, i, x, manual,x_path, intentos_fallidos):
     while intentos < MAX_INTENTOS:
         try:
             buscar = driver.find_element(By.XPATH, x_path)
-            print("Elemento encontrado y está presente.")
+            print("CDMX:Elemento encontrado y está presente.")
             break
 
         except Exception as e:
             intentos += 1
-            print("Cargando Ventana")
-            print(f"Intento {intentos} fallido. Error: 'elemento no Enocntrado'")
+            print("CDMX:Cargando Ventana")
+            print(f"CMDX: Intento {intentos} fallido. Error: 'elemento no Enocntrado'")
             time.sleep(30)
     
     if intentos == MAX_INTENTOS:
-        print(f"No se pudo encontrar el elemento después de {MAX_INTENTOS} intentos. Reiniciando el proceso.")
+        print(f"CMDX: No se pudo encontrar el elemento después de {MAX_INTENTOS} intentos. Reiniciando el proceso.")
         driver.quit()
         main(i, x, manual, intentos_fallidos) 
 
 def descargas_automatica_no_seguro(driver):
-    print("\nIniciando ajuste descargas automáticas")
+    print("CDMX:Iniciando ajuste descargas automáticas")
 
     for _ in range(7):
         element = driver.switch_to.active_element
@@ -79,7 +79,7 @@ def descargas_automatica_no_seguro(driver):
     element.send_keys(Keys.ENTER)
     sleep(2)
     
-    print("\nIniciando ajuste descargas no seguras")
+    print("CDMX:Iniciando ajuste descargas no seguras")
     
     for _ in range(5):
         element = driver.switch_to.active_element
@@ -116,40 +116,40 @@ def obtener_vqd(i):
     if len(VQDs) > 5:
         VQDs = random.sample(VQDs, 5)
 
-    print("\nValores de VQD:")
+    print("CDMX:Valores de VQD:")
     for VQD in VQDs:
         print(VQD)
 
     conteo_total_vqd = len(VQDs)
-    print("\nConteo total de valores en VQD:", conteo_total_vqd)
+    print("CDMX:Conteo total de valores en VQD:", conteo_total_vqd)
 
     return VQDs
 
 
 def agregar_valores_vqd(driver, i):
-    print("[VQD] Buscando input para valores de metadatos...")
+    print("CDMX:[VQD] Buscando input para valores de metadatos...")
     valores_input = driver.find_element(By.XPATH, metadatos_valores_input)
     driver.execute_script("arguments[0].scrollIntoView(true);", valores_input)
     try:
         VQDs = obtener_vqd(i)
-        print(f"[VQD] VQDs obtenidos: {VQDs}")
+        print(f"CMDX: [VQD] VQDs obtenidos: {VQDs}")
     except Exception as e:
-        print("[VQD] Error al obtener VQDs:", e) 
+        print("CDMX:[VQD] Error al obtener VQDs:", e) 
         VQDs = []
 
-    print(f"[VQD] Ingresando primer valor: {VQDs[0] if VQDs else '(no hay VQDs)'}")
+    print(f"CMDX: [VQD] Ingresando primer valor: {VQDs[0] if VQDs else '(no hay VQDs)'}")
     valores_input.click()
     if VQDs:
         valores_input.send_keys(VQDs[0])
     sleep(2)
 
-    print("[VQD] Buscando botón (+) para agregar más valores...")
+    print("CDMX:[VQD] Buscando botón (+) para agregar más valores...")
     valores_input_but_mas = driver.find_element(By.XPATH, metadatos_valores_boton_mas)
     driver.execute_script("arguments[0].scrollIntoView(true);", valores_input_but_mas)
     valores_input_but_mas.click()
 
     for j, vqd in enumerate(VQDs[1:], start=2):
-        print(f"[VQD] Ingresando valor adicional #{j}: {vqd}")
+        print(f"CMDX: [VQD] Ingresando valor adicional #{j}: {vqd}")
         valores_input_mas = driver.find_element(
             By.XPATH,
             f'/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[2]/div[3]/div[1]/div/metadata-filter/div/div/div/div/div[{j}]/div[2]/input[1]'
@@ -159,14 +159,14 @@ def agregar_valores_vqd(driver, i):
         valores_input_mas.send_keys(vqd)
         sleep(2)
         if j < len(VQDs):
-            print(f"[VQD] Haciendo click en botón (+) para agregar otro valor...")
+            print(f"CMDX: [VQD] Haciendo click en botón (+) para agregar otro valor...")
             valores_input_but_mas = driver.find_element(
                 By.XPATH,
                 f'/html/body/div[1]/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[2]/div[3]/div[1]/div/metadata-filter/div/div/div/div/div[{j}]/div[3]'
             )
             driver.execute_script("arguments[0].scrollIntoView(true);", valores_input_but_mas)
             valores_input_but_mas.click()
-    print("[VQD] Todos los valores VQD agregados correctamente.")
+    print("CDMX:[VQD] Todos los valores VQD agregados correctamente.")
 
 def main(i, x,manual, intentos_fallidos):
 
@@ -205,42 +205,42 @@ def main(i, x,manual, intentos_fallidos):
         validar_elemento_presentes(driver, i, x, manual,check_gen, intentos_fallidos)
 
         # ************ Inicio de sesion
-        print("Seleccionando opcion Genesys")
+        print("CDMX:Seleccionando opcion Genesys")
         boton_genesys = driver.find_element(By.XPATH, check_gen)
         boton_genesys.click()
         sleep(1)
 
-        print("Ingresando usuario")
+        print("CDMX:Ingresando usuario")
         user = driver.find_element(By.XPATH, usuario)
         user.click()
         user.send_keys('p-efgarciac')
         sleep(1)
 
-        print("Ingresando contraseña")
+        print("CDMX:Ingresando contraseña")
         password = driver.find_element(By.XPATH, contraseña)
         password.click()
         password.send_keys('14080')
         sleep(1)
 
-        print("Iniciando sesión")
+        print("CDMX:Iniciando sesión")
         password.send_keys(Keys.RETURN)
             
         validar_elemento_presentes(driver, i, x, manual,'//span[@class = "navbar-appname ng-binding"]', intentos_fallidos)
         
         # ********** SELECCION DE RANGO DE FECHAS
-        print("\nSeleccionando rango de fechas de seleccion de descarga")
+        print("CDMX:Seleccionando rango de fechas de seleccion de descarga")
         rango = driver.find_element(By.XPATH, rango_de_fechas)
         rango.click()
         sleep(2)
 
-        print("Seleccionando opcion Personalizada")
+        print("CDMX:Seleccionando opcion Personalizada")
         personal = driver.find_element(By.XPATH, personalizado)
         driver.execute_script("arguments[0].scrollIntoView(true);", personal)
         personal.click()
         sleep(2)
 
         if manual == True:
-            print("Ingresando a rango de fecha De: ")
+            print("CDMX:Ingresando a rango de fecha De: ")
             de_rango = driver.find_element(By.XPATH, de)
             today = datetime.datetime.now()
             yesterday = today - datetime.timedelta(days=1)
@@ -250,7 +250,7 @@ def main(i, x,manual, intentos_fallidos):
             de_rango.send_keys(fecha_formateada)
             sleep(2)
         else:
-            print("Ingresando a rango de fecha De: ")
+            print("CDMX:Ingresando a rango de fecha De: ")
             de_rango = driver.find_element(By.XPATH, de)
             today = datetime.datetime.now()
             fecha_formateada = today.strftime("%m/%d/%y")
@@ -265,12 +265,12 @@ def main(i, x,manual, intentos_fallidos):
             if x == "1":
                 rango_hora_2 = driver.find_element(By.XPATH, fecha_1)
                 rango_hora_2.click()
-                print("x es 0: No se selecciona ningún horario, se continúa con lo demás.")
+                print("CDMX:x es 0: No se selecciona ningún horario, se continúa con lo demás.")
                 sleep(2)
                 return
 
             if x in xpath:
-                print(f"Seleccionando horario final a hora {xpath[x]['hora']}")
+                print(f"CMDX: Seleccionando horario final a hora {xpath[x]['hora']}")
                 rango_hora_2 = driver.find_element(By.XPATH, fecha_1)
                 rango_hora_2.click()
                 sleep(2)
@@ -280,7 +280,7 @@ def main(i, x,manual, intentos_fallidos):
                 elemento.click()
                 sleep(2)
             else:
-                print("Valor de x no válido. Proporcione un valor entre 0 y 10.")
+                print("CDMX:Valor de x no válido. Proporcione un valor entre 0 y 10.")
         
         xpath = {
                 "3": {"hora": "9:00 am", "xpath": nueve_am_1},
@@ -302,7 +302,7 @@ def main(i, x,manual, intentos_fallidos):
         seleccionar_horario(driver, x, fecha_1, xpath)
 
         if manual == True:
-            print("Ingresando a rango de fecha De: ")
+            print("CDMX:Ingresando a rango de fecha De: ")
             de_rango = driver.find_element(By.XPATH, a)
             today = datetime.datetime.now()
             yesterday = today - datetime.timedelta(days=1)
@@ -312,7 +312,7 @@ def main(i, x,manual, intentos_fallidos):
             de_rango.send_keys(fecha_formateada)
             sleep(2)
         else:
-            print("Ingresando a rango de fecha De: ")
+            print("CDMX:Ingresando a rango de fecha De: ")
             de_rango = driver.find_element(By.XPATH, a)
             today = datetime.datetime.now()
             fecha_formateada = today.strftime("%m/%d/%y")
@@ -324,7 +324,7 @@ def main(i, x,manual, intentos_fallidos):
         
         def seleccionar_horario_final(driver, x, hora_a, xpath):
             if x in xpath:
-                print(f"Seleccionando horario final a hora {xpath[x]['hora']}")
+                print(f"CMDX: Seleccionando horario final a hora {xpath[x]['hora']}")
                 rango_hora_2 = driver.find_element(By.XPATH, hora_a)
                 rango_hora_2.click()
                 sleep(2)
@@ -334,7 +334,7 @@ def main(i, x,manual, intentos_fallidos):
                 elemento.click()
                 sleep(2)
             else:
-                print("Valor de x no válido. Proporcione un valor entre 0 y 10.")
+                print("CDMX:Valor de x no válido. Proporcione un valor entre 0 y 10.")
         
         xpath = {
                 "2": {"hora": "9:00 am", "xpath": nueve_am_2},
@@ -358,7 +358,7 @@ def main(i, x,manual, intentos_fallidos):
 
         # ********** SELECCION DE RANGO DE Habitantes
 
-        print("\nSeleccionando hablantes")
+        print("CDMX:Seleccionando hablantes")
         hablante = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[1]/div[2]/div[2]/div[2]/dropdown-tree/div/div/button')
         hablante.click()
         sleep(2)
@@ -372,7 +372,7 @@ def main(i, x,manual, intentos_fallidos):
         hablante_2.click()
         sleep(2)
         
-        print("\nIngresando a Metadatos")
+        print("CDMX:Ingresando a Metadatos")
         nombre = driver.find_element(By.XPATH, nombres)
         nombre.click()
 
@@ -380,38 +380,38 @@ def main(i, x,manual, intentos_fallidos):
         while observar:
             try:
                 observar_solamente = driver.find_element(By.XPATH, busqueda_meta)
-                print("metadatos abierto")
+                print("CDMX:metadatos abierto")
                 sleep(15)
                 break
             except:
-                print("Cargando pestaña de metadatos")
+                print("CDMX:Cargando pestaña de metadatos")
                 sleep(5)
 
-        print("Ingresando valor VQD")
+        print("CDMX:Ingresando valor VQD")
         busqueda_VQD = driver.find_element(By.XPATH, busqueda)
-        print(" - Campo de búsqueda encontrado, haciendo click...")
+        print("CDMX: - Campo de búsqueda encontrado, haciendo click...")
         busqueda_VQD.click()
-        print(" - Escribiendo 'VQD' en el campo de búsqueda...")
+        print("CDMX: - Escribiendo 'VQD' en el campo de búsqueda...")
         busqueda_VQD.send_keys('VQD')
         sleep(2)
 
         checkbox_vqd = driver.find_element(By.XPATH, check_vqd_cdmx)
-        print(" - Checkbox VQD encontrado, seleccionando...")
+        print("CDMX: - Checkbox VQD encontrado, seleccionando...")
         checkbox_vqd.click()
         sleep(2)
 
         valor = driver.find_element(By.XPATH, valores)
-        print(" - Campo de valores encontrado, haciendo click...")
+        print("CDMX: - Campo de valores encontrado, haciendo click...")
         valor.click()
         sleep(2)
 
-        print(" - Agregando valores VQD desde Excel...")
+        print("CDMX: - Agregando valores VQD desde Excel...")
         agregar_valores_vqd(driver, i)
         sleep(2)
-        print("Valores VQD agregados correctamente.\n")
+        print("CDMX:Valores VQD agregados correctamente.")
 
         
-        print("Ingresando rango de tiempo de llamadas")
+        print("CDMX:Ingresando rango de tiempo de llamadas")
         duracion = driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[3]/div[3]/div/div/div[3]/div/div/form/div[1]/div[4]/div/value-range-field-search/div/dropdown-select/div/div/button')
         duracion.click()
         sleep(2)
@@ -430,17 +430,17 @@ def main(i, x,manual, intentos_fallidos):
         sleep(1)
         rango_llamada_2.send_keys('1200')
         
-        print("Busqueda de audios iniciada")
+        print("CDMX:Busqueda de audios iniciada")
         busqueda_ex = driver.find_element(By.XPATH, buscar_resultados)
         busqueda_ex.click()
-        print("Esperando 90s para exportar")
+        print("CDMX:Esperando 90s para exportar")
         sleep(90)
 
         validar_elemento_presentes(driver, i, x, manual,'//span[@dir="ltr" and contains(@ng-show, "params.dataProvider.totalNumberOfResults") and contains(@class, "ng-binding")]', intentos_fallidos)
         
         try:
-            print("Esperando a que el checkbox de 'Seleccionar todo' esté presente y sea clickeable")
-            print("Click en checkbox seleccion todo")
+            print("CDMX:Esperando a que el checkbox de 'Seleccionar todo' esté presente y sea clickeable")
+            print("CDMX:Click en checkbox seleccion todo")
             checkbox_select = driver.find_element(By.XPATH, check_seleccion)
             checkbox_select.click()
             sleep(2)
@@ -451,19 +451,19 @@ def main(i, x,manual, intentos_fallidos):
                 match = re.search(r'\((\d+)\)', span_resultados.text)
                 if match:
                     n_audios = int(match.group(1))
-                    print(f"{n_audios} audios encontrados")
+                    print(f"CMDX: {n_audios} audios encontrados CMDX")
                 else:
-                    print("No se encontró el número de audios en el span.")
+                    print("CDMX:No se encontró el número de audios en el span.")
             except Exception as e:
-                print(f"No se pudo obtener el número de audios: {e}")
+                print(f"CMDX: No se pudo obtener el número de audios: {e}")
             
             try:
-                print("Expandiendo menu de seleccion")
+                print("CDMX:Expandiendo menu de seleccion")
                 exp_sel = driver.find_element(By.XPATH, expacion)
                 exp_sel.click()
                 sleep(2)
                 
-                print("Seleccionando exportar")
+                print("CDMX:Seleccionando exportar")
                 expo_expo = driver.find_element(By.XPATH, expacion_exportar)
                 try:
                     expo_expo.click()
@@ -474,13 +474,13 @@ def main(i, x,manual, intentos_fallidos):
                 
                 # ********** VENTANA DE EXPORTACION MODAL 1
                 
-                print("\nAccediendo a ventana modal 1 seleccion de audios")
+                print("CDMX:Accediendo a ventana modal 1 seleccion de audios")
             except Exception as e:
                 intentos_actuales += 1
                 intentos_fallidos[iteraccion] = intentos_actuales
                 if intentos_actuales < 5:
-                    print(f"error: {e}")
-                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    print(f"CMDX: error: {e}")
+                    print(f"CMDX: Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
                     driver.quit()
                     main(i, x, manual, intentos_fallidos)
                     return
@@ -491,47 +491,47 @@ def main(i, x,manual, intentos_fallidos):
                     sys.exit(1)
 
             try:
-                print("Esperando a que la primer ventana modal esté visible")
+                print("CDMX:Esperando a que la primer ventana modal esté visible")
                 modal = WebDriverWait(driver, 60).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.export-modal.in'))
                 )
-                print("Modal está visible")
+                print("CDMX:Modal está visible")
                 sleep(2)
                 
                 try:
-                    print("Esperando a que el radio button esté clickeable")
+                    print("CDMX:Esperando a que el radio button esté clickeable")
                     radio_button = WebDriverWait(driver, 120).until(
                         EC.element_to_be_clickable((By.XPATH, '//div[@class="radio"]/label[input[@type="radio" and @value="true" and @ng-value="true"]]'))
                     )
-                    print("Radio button está clickeable")
+                    print("CDMX:Radio button está clickeable")
                     radio_button.click()
-                    print("Hicimos clic en el radio button")
+                    print("CDMX:Hicimos clic en el radio button")
                 except Exception as e:
-                    print("Radio button no está presente o no es clickeable. Continuando sin hacer clic en el radio button.")
+                    print("CDMX:Radio button no está presente o no es clickeable. Continuando sin hacer clic en el radio button.")
                 
                 sleep(2)
                 
-                print("Esperando a que el checkbox esté clickeable")
+                print("CDMX:Esperando a que el checkbox esté clickeable")
                 checkbox = WebDriverWait(driver, 60).until(
                     EC.element_to_be_clickable((By.XPATH, '//div[@class="checkbox"]/label[input[@type="checkbox" and @ng-model="exportData.exportWithAudio"]]'))
                 )
 
-                print("Checkbox está clickeable")
+                print("CDMX:Checkbox está clickeable")
 
                 checkbox.click()
-                print("Hicimos clic en el checkbox")
+                print("CDMX:Hicimos clic en el checkbox")
                 
                 sleep(2)
                 
-                print("Esperando a que el botón de exportar esté presente y sea clickeable")
+                print("CDMX:Esperando a que el botón de exportar esté presente y sea clickeable")
                 boton_exportar = WebDriverWait(driver, 60).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[@translate="Explore.BatchActions.Export.ExportButton"]'))
                 )
 
-                print("Botón de exportar está presente y es clickeable")
+                print("CDMX:Botón de exportar está presente y es clickeable")
 
                 boton_exportar.click()
-                print("Se hizo clic en el botón de exportar")
+                print("CDMX:Se hizo clic en el botón de exportar")
                 sleep(5)
 
 
@@ -539,7 +539,7 @@ def main(i, x,manual, intentos_fallidos):
                 intentos_actuales += 1
                 intentos_fallidos[iteraccion] = intentos_actuales
                 if intentos_actuales < 5:
-                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    print(f"CMDX: Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
                     driver.quit()
                     main(i, x, manual, intentos_fallidos)
                     return
@@ -552,23 +552,23 @@ def main(i, x,manual, intentos_fallidos):
                 
             # ********** VENTANA DE EXPORTACION MODAL 2
             
-            print("\nAccediendo a ventana modal 2 generador de contraseñas")
+            print("CDMX:Accediendo a ventana modal 2 generador de contraseñas")
             
             try:
-                print("Esperando a que la segunda ventana modal esté visible")
+                print("CDMX:Esperando a que la segunda ventana modal esté visible")
                 modal = WebDriverWait(driver, 20).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
                 )
-                print("Modal está visible")
+                print("CDMX:Modal está visible")
 
                 sleep(2)
                 
-                print("Esperando a que el campo de contraseña esté presente y sea interactuable")
+                print("CDMX:Esperando a que el campo de contraseña esté presente y sea interactuable")
                 input_contraseña = WebDriverWait(driver, 20).until(
                     EC.element_to_be_clickable((By.CLASS_NAME, "password-input"))
                 )
 
-                print("Campo de contraseña está presente y es interactuable")
+                print("CDMX:Campo de contraseña está presente y es interactuable")
 
                 input_contraseña.clear()
 
@@ -577,15 +577,15 @@ def main(i, x,manual, intentos_fallidos):
                 
                 sleep(2)
 
-                print("Esperando a que el botón 'Exportar' esté presente y sea clickeable")
+                print("CDMX:Esperando a que el botón 'Exportar' esté presente y sea clickeable")
                 boton_exportar = WebDriverWait(driver, 20).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[@ng-if="logic.isStrongPassword()"]'))
                 )
 
-                print("Botón 'Exportar' está presente y es clickeable")
+                print("CDMX:Botón 'Exportar' está presente y es clickeable")
 
                 boton_exportar.click()
-                print("Se hizo clic en el botón 'Exportar'")
+                print("CDMX:Se hizo clic en el botón 'Exportar'")
                 
                 sleep(2)
                 
@@ -593,7 +593,7 @@ def main(i, x,manual, intentos_fallidos):
                 intentos_actuales += 1
                 intentos_fallidos[iteraccion] = intentos_actuales
                 if intentos_actuales < 5:
-                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    print(f"CMDX: Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
                     driver.quit()
                     main(i, x, manual, intentos_fallidos)
                     return
@@ -606,21 +606,21 @@ def main(i, x,manual, intentos_fallidos):
             
             # ********** VENTANA DE EXPORTACION MODAL 3
             
-            print("\nAccediendo a ventana modal 3 confirmacion")
+            print("CDMX:Accediendo a ventana modal 3 confirmacion")
             
             try:
-                print("Esperando a que la tercer ventana modal esté visible")
+                print("CDMX:Esperando a que la tercer ventana modal esté visible")
                 modal = WebDriverWait(driver, 20).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.modal.fade.ng-isolate-scope.in'))
                 )
-                print("Modal está visible")
+                print("CDMX:Modal está visible")
 
                 sleep(20)
             except Exception as e:
                 intentos_actuales += 1
                 intentos_fallidos[iteraccion] = intentos_actuales
                 if intentos_actuales < 5:
-                    print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+                    print(f"CMDX: Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
                     driver.quit()
                     main(i, x, manual, intentos_fallidos)
                     return
@@ -631,23 +631,23 @@ def main(i, x,manual, intentos_fallidos):
                     sys.exit(1)
                 
             try:
-                print("Esperando a que el botón 'Completado' esté presente y sea clickeable")
+                print("CDMX:Esperando a que el botón 'Completado' esté presente y sea clickeable")
                 boton_completado = WebDriverWait(driver, 20).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[@translate="General.Done"]'))
                 )
 
-                print("Botón 'Completado' está presente y es clickeable")
+                print("CDMX:Botón 'Completado' está presente y es clickeable")
 
                 boton_completado.click()
-                print("Se hizo clic en el botón 'Completado'")
+                print("CDMX:Se hizo clic en el botón 'Completado'")
                 sleep(3)
             except Exception as e:
-                print(f"boton completado error: {e}")
+                print(f"CMDX: boton completado error: {e}")
                     
             try:
                 hora_actual = datetime.datetime.now().strftime("%H:%M:%S")
-                print(f"Hora Actual:{hora_actual}")
-                print(f"Esperando la descarga de {n_audios} audios.......")
+                print(f"CMDX: Hora Actual:{hora_actual}")
+                print(f"CMDX: Esperando la descarga de {n_audios} audios.......")
                 sleep(300)
 
                 directorio = r"C:\Users\Jotzi1\Downloads"
@@ -655,34 +655,34 @@ def main(i, x,manual, intentos_fallidos):
                 contador = 0  # Inicializa el contador
 
                 while resultado and contador < 35:
-                    print("Buscando...")
+                    print("CDMX:Buscando...")
                     resultado = find_zip_p_efgarciac(directorio)
                     contador += 1
 
-                if contador == 40:
-                    print(f"Finalizado después de 40 intentos no se logro descargar el archivo del horario {x} campaña {i}.")
+                if contador == 35:
+                    print(f"CMDX: Finalizado después de 35 intentos no se logro descargar el archivo del horario {x} campaña {i}.")
                 else:
-                    print("Descarga exitosa Procediendo a extraer")
+                    print("CDMX:Descarga exitosa Procediendo a extraer")
             except Exception as e:
-                print(f"Ocurrió un error al cerrar la sesion: {e}")
+                print(f"CMDX: Ocurrió un error al cerrar la sesion: {e}")
                 
             try:
-                print("Cerrando sesion")
+                print("CDMX:Cerrando sesion")
                 usu_cierre = driver.find_element(By.XPATH, user_cierre)
                 usu_cierre.click()
                 sleep(3)
             except Exception as e:
-                print(f"Ocurrió un erro al cerrar sesion: {e}")
-                print(f"sesion posiblemente cerrado")
+                print(f"CMDX: Ocurrió un erro al cerrar sesion: {e}")
+                print(f"CMDX: sesion posiblemente cerrado")
             try:
                 cierre_final = driver.find_element(By.XPATH, cierre)
                 cierre_final.click()
-                print("sesion cerrada")
+                print("CDMX:sesion cerrada")
                 sleep(30)
                 driver.quit()
             except Exception as e:
-                print(f"Ocurrió un erro al cerrar sesion: {e}")
-                print(f"sesion posiblemente cerrado")
+                print(f"CMDX: Ocurrió un erro al cerrar sesion: {e}")
+                print(f"CMDX: sesion posiblemente cerrado")
                 driver.quit()
 
         except Exception as e:
@@ -694,33 +694,33 @@ def main(i, x,manual, intentos_fallidos):
                 campaña="Retenciones CMDX"
             if i==3:
                 campaña="Televentas"
-            print(f"⚠️ No se encontraron audios para exportar en la horario: {x}, campaña {campaña}. Saltando a la siguiente campaña.")
+            print(f"CMDX: ⚠️ No se encontraron audios para exportar en la horario: {x}, campaña {campaña}. Saltando a la siguiente campaña.")
             send_msg(f"⚠️ No se encontraron audios para exportar en la horario: {x}, campaña {campaña}. Saltando a la siguiente campaña.")
             driver.quit()
             return
         
-        print("\nIniciando extraccion de archvio zip")
+        print("CDMX:Iniciando extraccion de archvio zip")
         subprocess.run(["python", "extraccion_archivos.py", f"{str(i)}"])
         sleep(2)
         
-        print("\nIniciando movimiento y renombramiento de archivos de audio")
+        print("CDMX:Iniciando movimiento y renombramiento de archivos de audio")
         subprocess.run(["python", "mover_renombrar.py", f"{str(i)}"])
         sleep(2)
         
-        print("\nIniciando carga a la base de datos")
+        print("CDMX:Iniciando carga a la base de datos")
         subprocess.run(["python", "carga_base.py", f"{str(i)}"])
         sleep(2)
 
-        print("\nAsignando audios de avena")
+        print("CDMX:Asignando audios de avena")
         subprocess.run(["python", "Procesos_MySQL.py"])
         sleep(2)
 
         if i == 2:
-            print("\nRealizando la Asignacion de Avena")
+            print("CDMX:Realizando la Asignacion de Avena")
             subprocess.run(["python", "ProcesoMSQL_avena.py"])
             sleep(2)
 
-        print("\nSubiendo audios al ftp")
+        print("CDMX:Subiendo audios al ftp")
         subprocess.run(["python", "mover_audios_filtrados.py"])
         sleep(20)
 
@@ -728,7 +728,7 @@ def main(i, x,manual, intentos_fallidos):
         intentos_actuales += 1
         intentos_fallidos[iteraccion] = intentos_actuales
         if intentos_actuales < 5:
-            print(f"Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
+            print(f"CMDX: Error en el proceso. Reintentando intento {intentos_actuales}/5 para x={x}, i={i}")
             driver.quit()
             main(i, x, manual, intentos_fallidos)
         else:
@@ -772,7 +772,7 @@ def dormir_hasta(dt_obj: datetime):
         mins, secs = divmod(int(restante), 60)
 
 def run_por_horario(main, send_msg):
-    horarios_keys = ["3","4","5","6","7","8","9","10","11","12"]
+    horarios_keys = ["4","5","6","7","8","9","10","11","12"]
     intentos_fallidos = {}
     manual = False
     EJECUTAR_SI_PASADO = True
@@ -789,16 +789,16 @@ def run_por_horario(main, send_msg):
         ahora = datetime.datetime.now()
 
         if manual:
-            print(f"[{ahora:%Y-%m-%d %H:%M:%S}] Ejecutando horario {x} ({hora_str} - {hora_final}) en modo manual.")
+            print(f"CMDX: [{ahora:%Y-%m-%d %H:%M:%S}] Ejecutando horario {x} ({hora_str} - {hora_final}) en modo manual.")
         else:
             if objetivo <= ahora:
                 if EJECUTAR_SI_PASADO:
-                    print(f"[{ahora:%Y-%m-%d %H:%M:%S}] Horario {x} ({hora_str} - {hora_final}) ya pasó, pero se ejecuta por configuración EJECUTAR_SI_PASADO=True.")
+                    print(f"CMDX: [{ahora:%Y-%m-%d %H:%M:%S}] Horario {x} ({hora_str} - {hora_final}) ya pasó, pero se ejecuta por configuración EJECUTAR_SI_PASADO=True.")
                 else:
-                    print(f"[{ahora:%Y-%m-%d %H:%M:%S}] Horario {x} ({hora_str} - {hora_final}) ya pasó, saltando (EJECUTAR_SI_PASADO=False).")
+                    print(f"CMDX: [{ahora:%Y-%m-%d %H:%M:%S}] Horario {x} ({hora_str} - {hora_final}) ya pasó, saltando (EJECUTAR_SI_PASADO=False).")
                     continue
             else:
-                print(f"Programado horario {x} a las {hora_str} - {hora_final}. Esperando...")
+                print(f"CMDX: Programado horario {x} a las {hora_str} - {hora_final}. Esperando...")
                 dormir_hasta(objetivo)
 
         # Ejecutar los 4 intentos para ese horario
@@ -813,7 +813,7 @@ def run_por_horario(main, send_msg):
             else:
                 iteraccion = "Televentas"
             ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print(f"\n[{ts}] Ejecutando horario: {x} ({hora_str} - {hora_final}) - Campaña {iteraccion}")
+            print(f"CMDX: [{ts}] Ejecutando horario: {x} ({hora_str} - {hora_final}) - Campaña {iteraccion}")
             main(i, x, manual, intentos_fallidos)
 
 

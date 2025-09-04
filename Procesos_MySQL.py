@@ -1,124 +1,156 @@
 import mysql.connector
 import time
 from Tele import send_msg
-from datetime import datetime, timedelta
+from datetime import datetime
 
-UMBRAL_DANA = 700
-UMBRAL_SPEECH = 7000
 PAUSA_SEGUNDOS = 2
 
-def verificar_registros(consulta, cursor, procedimiento, tabla, conexion):
-    """
-    Solo ejecuta el procedimiento si hay al menos un registro en la tabla respectiva.
-    """
-    try:
-        cursor.execute(consulta)
-        hay_registros = cursor.fetchone() is not None
-    except mysql.connector.Error as err:
-        msg = f"Error verificando {tabla}: {err}"
-        print(msg)
-        send_msg(msg)
-        return False
+# ==== BLOQUE AUDIOS (como antes) ====
+PROCEDIMIENTOS_AUDIOS = [
+    {
+        "reporte": "reporte_audios_retenciones",
+        "procedimiento": "Sp_AsignacioneRetencionCDMXCV_intervalos_Temporales",
+        "tipo": "retenciones",
+        "umbral": 100
+    },
+    {
+        "reporte": "reporte_audios_servicios",
+        "procedimiento": "Sp_AsignacioneServiciosCDMX_intervalos_temporales",
+        "tipo": "servicios",
+        "umbral": 300
+    },
+    {
+        "reporte": "reporte_audios_servicios_apodaca",
+        "procedimiento": "Sp_AsignacioneServiciosApodaca_intervalos_temporales",
+        "tipo": "servicios",
+        "umbral": 300
+    },
+    {
+        "reporte": "reporte_audios_soporte",
+        "procedimiento": "Sp_AsignacioneSoporteCDMXCV_intervalos_temporales",
+        "tipo": "soporte",
+        "umbral": 300
+    },
+    {
+        "reporte": "reporte_audios_soporte_apodaca",
+        "procedimiento": "Sp_AsignacioneSoporteAPODACA_intervalos_temporales",
+        "tipo": "soporte",
+        "umbral": 300
+    }
+]
 
-    if not hay_registros:
-        print(f"No hay registros en la tabla de {tabla}, NO se ejecuta {procedimiento}")
-        time.sleep(PAUSA_SEGUNDOS)
-        return False
+# ==== BLOQUE SPEECH ====
+PROCEDIMIENTOS_SPEECH = [
+    {
+        "reporte": "reporteAudiosSoporteSpeech",
+        "procedimiento": "Sp_AsignacionSoporteCDMXSpeech",
+        "tipo": "soporte",
+        "umbral": 2450
+    },
+    {
+        "reporte": "reporteAudiosSoporteApodacaSpeech",
+        "procedimiento": "Sp_AsignacionSoporteApodacaSpeech",
+        "tipo": "soporte",
+        "umbral": 2450
+    },
+    {
+        "reporte": "reporteAudiosServiciosSpeech",
+        "procedimiento": "Sp_AsignacionServiciosCDMXSpeech",
+        "tipo": "servicios",
+        "umbral": 1750
+    },
+    {
+        "reporte": "reporteAudiosServiciosApodacaSpeech",
+        "procedimiento": "Sp_AsignacionServiciosApodacaSpeech",
+        "tipo": "servicios",
+        "umbral": 1750
+    },
+    {
+        "reporte": "reporteAudiosteleventasSpeech",
+        "procedimiento": "Sp_AsignacionTeleventasSpeech",
+        "tipo": "ventas",
+        "umbral": 1400
+    },
+    {
+        "reporte": "reporteAudiosRetencionesSpeech",
+        "procedimiento": "Sp_AsignacionRetencionSpeech",
+        "tipo": "retenciones",
+        "umbral": 1400
+    }
+]
 
-    print(f"Se encontraron registros en la tabla de: {tabla}. Ejecutando {procedimiento}...")
-    try:
-        cursor.execute("SET SQL_SAFE_UPDATES = 0;")
-        cursor.execute(f"CALL {procedimiento}()")
-        conexion.commit()
-        print(f"Procedimiento {procedimiento} ejecutado.")
-        return True
-    except mysql.connector.Error as err:
-        error_message = f"Error al ejecutar {procedimiento}: {err}"
-        print(error_message)
-        send_msg(error_message)
-        return False
-    finally:
-        time.sleep(PAUSA_SEGUNDOS)
+def hay_registros_en_reporte(cursor, reporte):
+    consulta = f"SELECT 1 FROM audios_dana.{reporte} LIMIT 1;"
+    cursor.execute(consulta)
+    return cursor.fetchone() is not None
 
-def contar_registros(cursor, tabla, fecha, status='Pendiente'):
-    sql_count = f"""
-        SELECT COUNT(*)
-        FROM {tabla}
-        WHERE DATE(fecha_llamada) = %s AND status = %s
+def contar_registros(cursor, tabla, fecha, tipo):
+    consulta = f"""
+        SELECT COUNT(*) FROM audios_dana.{tabla}
+        WHERE DATE(fecha_llamada) = %s AND tipo = %s
     """
-    cursor.execute(sql_count, (fecha, status))
+    cursor.execute(consulta, (fecha, tipo))
     row = cursor.fetchone()
     return row[0] if row else 0
 
+def ejecutar_procedimiento(cursor, conexion, procedimiento, reporte, umbral, total_actual):
+    print(f"Total actual para {reporte}: {total_actual}. Umbral: {umbral}")
+    if total_actual <= umbral:
+        try:
+            cursor.execute("SET SQL_SAFE_UPDATES = 0;")
+            cursor.execute(f"CALL {procedimiento}()")
+            conexion.commit()
+            print(f"Procedimiento {procedimiento} ejecutado correctamente.")
+            return True
+        except mysql.connector.Error as err:
+            msg = f"Error al ejecutar {procedimiento}: {err}"
+            print(msg)
+            send_msg(msg)
+    else:
+        print(f"Ya hay más de {umbral} registros para el tipo en la tabla. NO se ejecuta {procedimiento}")
+    return False
+
 def main():
     try:
-        conexion_dana = mysql.connector.connect(
+        conexion = mysql.connector.connect(
             host="192.168.51.210",
             user="root",
             password="thor",
             database="audios_dana"
         )
-        cursor_dana = conexion_dana.cursor()
+        cursor = conexion.cursor()
     except mysql.connector.Error as err:
         print(f"No se pudo conectar a audios_dana: {err}")
         send_msg(f"No se pudo conectar a audios_dana: {err}")
         return
 
-    consultas_y_procedimientos_dana = [
-        ("SELECT 1 FROM audios_dana.reporte_audios_retenciones LIMIT 1;", "Sp_AsignacioneRetencionCDMXCV_intervalos_Temporales", "retenciones"),
-        ("SELECT 1 FROM audios_dana.reporte_audios_servicios LIMIT 1;", "Sp_AsignacioneServiciosCDMX_intervalos_temporales", "servicios"),
-        ("SELECT 1 FROM audios_dana.reporte_audios_servicios_apodaca LIMIT 1;", "Sp_AsignacioneServiciosApodaca_intervalos_temporales", "servicios_apodaca"),
-        ("SELECT 1 FROM audios_dana.reporte_audios_soporte LIMIT 1;", "Sp_AsignacioneSoporteCDMXCV_intervalos_temporales", "soporte"),
-        ("SELECT 1 FROM audios_dana.reporte_audios_soporte_apodaca LIMIT 1;", "Sp_AsignacioneSoporteAPODACA_intervalos_temporales", "soporte_apodaca")
-    ]
+    hoy = datetime.now().date()
 
-    # BLOQUE AUDIOS_DANA
+    # BLOQUE AUDIOS
+    for proc in PROCEDIMIENTOS_AUDIOS:
+        print(f"\n---- Procesando {proc['reporte']} (audios, tipo={proc['tipo']}, umbral={proc['umbral']}) ----")
+        if hay_registros_en_reporte(cursor, proc["reporte"]):
+            total_actual = contar_registros(cursor, "audios", hoy, proc["tipo"])
+            ejecutar_procedimiento(cursor, conexion, proc["procedimiento"], proc["reporte"], proc["umbral"], total_actual)
+        else:
+            print(f"No hay registros en {proc['reporte']}, NO se ejecuta {proc['procedimiento']}")
+        time.sleep(PAUSA_SEGUNDOS)
+
+    # BLOQUE SPEECH
+    for proc in PROCEDIMIENTOS_SPEECH:
+        print(f"\n---- Procesando {proc['reporte']} (speech, tipo={proc['tipo']}, umbral={proc['umbral']}) ----")
+        if hay_registros_en_reporte(cursor, proc["reporte"]):
+            total_actual = contar_registros(cursor, "audiosSpeech", hoy, proc["tipo"])
+            ejecutar_procedimiento(cursor, conexion, proc["procedimiento"], proc["reporte"], proc["umbral"], total_actual)
+        else:
+            print(f"No hay registros en {proc['reporte']}, NO se ejecuta {proc['procedimiento']}")
+        time.sleep(PAUSA_SEGUNDOS)
+
     try:
-        hoy = datetime.now().date()
-        cantidad = contar_registros(cursor_dana, "audios_dana.audios", hoy)
-        print(f"Registros en audios_dana para {hoy}: {cantidad}")
-
-        if cantidad < UMBRAL_DANA:
-            print(f"Menos de {UMBRAL_DANA} → ejecutando procedimientos de audios_dana una sola vez...")
-            for consulta, procedimiento, tabla in consultas_y_procedimientos_dana:
-                verificar_registros(consulta, cursor_dana, procedimiento, tabla, conexion_dana)
-
-            cantidad_post = contar_registros(cursor_dana, "audios_dana.audios", hoy)
-            print(f"Recuento tras ejecutar procedimientos: {cantidad_post}")
-        else:
-            print(f"Ya hay {cantidad} (≥ {UMBRAL_DANA}). No se ejecutan procedimientos de audios_dana.")
-
-        # BLOQUE AUDIOS_SPEECH
-        cantidad_speech = contar_registros(cursor_dana, "audios_dana.audiosSpeech", hoy)
-        print(f"Registros en audiosSpeech para {hoy}: {cantidad_speech}")
-
-        procedimientos_speech = [
-            ("SELECT 1 FROM audios_dana.reporteAudiosSoporteSpeech LIMIT 1;",        "Sp_AsignacionSoporteCDMXSpeech",         "reporteAudiosSoporteSpeech"),
-            ("SELECT 1 FROM audios_dana.reporteAudiosSoporteApodacaSpeech LIMIT 1;", "Sp_AsignacionSoporteApodacaSpeech",      "reporteAudiosSoporteApodacaSpeech"),
-            ("SELECT 1 FROM audios_dana.reporteAudiosServiciosSpeech LIMIT 1;",      "Sp_AsignacionServiciosCDMXSpeech",       "reporteAudiosServiciosSpeech"),
-            ("SELECT 1 FROM audios_dana.reporteAudiosServiciosApodacaSpeech LIMIT 1;","Sp_AsignacionServiciosApodacaSpeech",    "reporteAudiosServiciosApodacaSpeech"),
-            ("SELECT 1 FROM audios_dana.reporteAudiosteleventasSpeech LIMIT 1;",     "Sp_AsignacionTeleventasSpeech",          "reporteAudiosteleventasSpeech"),
-            ("SELECT 1 FROM audios_dana.reporteAudiosRetencionesSpeech LIMIT 1;",    "Sp_AsignacionRetencionSpeech",           "reporteAudiosRetencionesSpeech")
-        ]
-
-        if cantidad_speech < UMBRAL_SPEECH:
-            print(f"Menos de {UMBRAL_SPEECH} → ejecutando procedimientos de audiosSpeech una sola vez...")
-            for consulta, procedimiento, tabla in procedimientos_speech:
-                verificar_registros(consulta, cursor_dana, procedimiento, tabla, conexion_dana)
-
-            cantidad_speech_post = contar_registros(cursor_dana, "audios_dana.audiosSpeech", hoy)
-            print(f"Recuento tras ejecutar procedimientos audiosSpeech: {cantidad_speech_post}")
-        else:
-            print(f"Ya hay {cantidad_speech} (≥ {UMBRAL_SPEECH}). No se ejecutan procedimientos de audiosSpeech.")
-
-    except mysql.connector.Error as err:
-        print(f"Error de MySQL: {err}")
-        send_msg(f"Error de MySQL en el flujo principal: {err}")
-    finally:
-        try: cursor_dana.close()
-        except Exception: pass
-        try: conexion_dana.close()
-        except Exception: pass
+        cursor.close()
+        conexion.close()
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     main()
